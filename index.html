@@ -728,9 +728,6 @@
           </div>
 
           <ul id="shopping-list"></ul>
-          <p class="hint">
-            Gli ingredienti aggiunti automaticamente dal menu mostrano il nome del piatto e, se serve più volte, un moltiplicatore (es. ×2).
-          </p>
         </section>
 
         <!-- TAB MENU -->
@@ -743,13 +740,10 @@
 
             <div id="menu-piatti">
               <h2>Gestione piatti</h2>
-              <p class="hint">
-                Formato ingredienti: uno per riga, opzionale quantità dopo <code>;</code> (es. <code>pasta; 200 g</code>).
-              </p>
 
               <div class="row" style="margin-top:0.6rem;">
                 <div class="col">
-                  <h3>Primi (max 14)</h3>
+                  <h3>Primi</h3>
                   <form id="add-primo-form" style="margin-bottom:0.5rem;">
                     <label for="primo-name">Nome piatto</label>
                     <input type="text" id="primo-name" required placeholder="es. Pasta al pomodoro">
@@ -768,7 +762,7 @@
                 </div>
 
                 <div class="col">
-                  <h3>Secondi (max 14)</h3>
+                  <h3>Secondi</h3>
                   <form id="add-secondo-form" style="margin-bottom:0.5rem;">
                     <label for="secondo-name">Nome piatto</label>
                     <input type="text" id="secondo-name" required placeholder="es. Pollo e patate">
@@ -1232,10 +1226,6 @@
 
       addPrimoForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (state.dishes.primi.length >= 14) {
-          alert('Hai già inserito 14 primi.');
-          return;
-        }
         const name = primoNameInput.value.trim();
         if (!name) return;
         const ingredientsLines = primoIngredientsInput.value
@@ -1262,10 +1252,6 @@
 
       addSecondoForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (state.dishes.secondi.length >= 14) {
-          alert('Hai già inserito 14 secondi.');
-          return;
-        }
         const name = secondoNameInput.value.trim();
         if (!name) return;
         const ingredientsLines = secondoIngredientsInput.value
