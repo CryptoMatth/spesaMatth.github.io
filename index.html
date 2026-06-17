@@ -668,6 +668,13 @@
             Formato suggerito: <code>ingrediente; quantità</code>, es. <code>pasta; 200 g</code>.
           </p>
 
+          <div style="margin-top:0.4rem; display:flex; gap:0.5rem; align-items:center;">
+            <input type="checkbox" id="edit-count-once">
+            <label for="edit-count-once" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+              Conta gli ingredienti una sola volta anche se il piatto appare più volte
+            </label>
+          </div>
+
           <div id="edit-dish-buttons">
             <button type="button" id="edit-dish-cancel" class="btn-secondary">Annulla</button>
             <button type="submit" class="btn-primary">Salva modifiche</button>
@@ -753,6 +760,13 @@
                     </label>
                     <textarea id="primo-ingredients" placeholder="pasta; 200 g&#10;passata; 1 barattolo..."></textarea>
 
+                    <div style="margin-top:0.4rem; display:flex; gap:0.5rem; align-items:center;">
+                      <input type="checkbox" id="primo-count-once">
+                      <label for="primo-count-once" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+                        Conta gli ingredienti una sola volta anche se il piatto appare più volte
+                      </label>
+                    </div>
+
                     <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
                       <button type="submit" class="btn-secondary">Aggiungi primo</button>
                     </div>
@@ -771,6 +785,13 @@
                       Ingredienti (uno per riga, opzionale quantità con “;”)
                     </label>
                     <textarea id="secondo-ingredients" placeholder="pollo; 300 g&#10;patate; 500 g..."></textarea>
+
+                    <div style="margin-top:0.4rem; display:flex; gap:0.5rem; align-items:center;">
+                      <input type="checkbox" id="secondo-count-once">
+                      <label for="secondo-count-once" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+                        Conta gli ingredienti una sola volta anche se il piatto appare più volte
+                      </label>
+                    </div>
 
                     <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
                       <button type="submit" class="btn-secondary">Aggiungi secondo</button>
@@ -819,7 +840,8 @@
 
               <p class="hint" style="margin-top:0.6rem;">
                 Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa
-                con nome e quantità indicata. Se lo stesso ingrediente appare più volte nella settimana, vedrai il moltiplicatore (×2, ×3, ...).
+                con nome e quantità indicata. Se lo stesso ingrediente appare più volte nella settimana, vedrai il moltiplicatore (×2, ×3, ...),
+                a meno che tu abbia scelto di contarli una sola volta.
               </p>
             </div>
           </div>
@@ -886,6 +908,13 @@
               weekPlan: state.prevWeekPlan
             });
           }
+
+          state.dishes.primi.forEach(d => {
+            if (d.countOnce === undefined) d.countOnce = false;
+          });
+          state.dishes.secondi.forEach(d => {
+            if (d.countOnce === undefined) d.countOnce = false;
+          });
         } catch (e) {
           console.error('Errore nel loadState', e);
         }
@@ -922,6 +951,7 @@
       const editNameInput = document.getElementById('edit-dish-name');
       const editIngredientsInput = document.getElementById('edit-dish-ingredients');
       const editCancelBtn = document.getElementById('edit-dish-cancel');
+      const editCountOnceInput = document.getElementById('edit-count-once');
 
       let editingDishId = null;
       let editingDishType = null;
@@ -929,7 +959,7 @@
       exportBtn.addEventListener('click', function() {
         const payload = {
           state,
-          version: 2,
+          version: 3,
           exportedAt: new Date().toISOString()
         };
         downloadJSON(payload, 'spesa-menu-backup.json');
@@ -968,6 +998,12 @@
             if (!state.dishes.secondi) state.dishes.secondi = [];
             if (!Array.isArray(state.shopping)) state.shopping = [];
             if (!Array.isArray(state.historyWeeks)) state.historyWeeks = [];
+            state.dishes.primi.forEach(d => {
+              if (d.countOnce === undefined) d.countOnce = false;
+            });
+            state.dishes.secondi.forEach(d => {
+              if (d.countOnce === undefined) d.countOnce = false;
+            });
 
             saveState();
             renderAll();
@@ -1195,6 +1231,8 @@
       const primoIngredientsInput = document.getElementById('primo-ingredients');
       const secondoNameInput = document.getElementById('secondo-name');
       const secondoIngredientsInput = document.getElementById('secondo-ingredients');
+      const primoCountOnceInput = document.getElementById('primo-count-once');
+      const secondoCountOnceInput = document.getElementById('secondo-count-once');
 
       function parseIngredientLine(line) {
         const parts = line.split(';');
@@ -1240,10 +1278,12 @@
         state.dishes.primi.push({
           id: uid(),
           name,
-          ingredients
+          ingredients,
+          countOnce: !!primoCountOnceInput.checked
         });
         primoNameInput.value = '';
         primoIngredientsInput.value = '';
+        primoCountOnceInput.checked = false;
         saveState();
         renderDishes();
         renderWeekSelectors();
@@ -1266,10 +1306,12 @@
         state.dishes.secondi.push({
           id: uid(),
           name,
-          ingredients
+          ingredients,
+          countOnce: !!secondoCountOnceInput.checked
         });
         secondoNameInput.value = '';
         secondoIngredientsInput.value = '';
+        secondoCountOnceInput.checked = false;
         saveState();
         renderDishes();
         renderWeekSelectors();
@@ -1322,6 +1364,7 @@
         } else {
           state.dishes.primi.forEach(dish => {
             ensureIngredientObjects(dish);
+            if (dish.countOnce === undefined) dish.countOnce = false;
             const li = document.createElement('li');
             li.className = 'dish-item';
 
@@ -1337,7 +1380,7 @@
 
             const metaSpan = document.createElement('div');
             metaSpan.className = 'dish-item-meta';
-            metaSpan.textContent = `${dish.ingredients.length} ingredienti`;
+            metaSpan.textContent = `${dish.ingredients.length} ingredienti` + (dish.countOnce ? ' · conta una sola volta' : '');
 
             body.appendChild(nameSpan);
             body.appendChild(metaSpan);
@@ -1378,6 +1421,7 @@
         } else {
           state.dishes.secondi.forEach(dish => {
             ensureIngredientObjects(dish);
+            if (dish.countOnce === undefined) dish.countOnce = false;
             const li = document.createElement('li');
             li.className = 'dish-item';
 
@@ -1393,7 +1437,7 @@
 
             const metaSpan = document.createElement('div');
             metaSpan.className = 'dish-item-meta';
-            metaSpan.textContent = `${dish.ingredients.length} ingredienti`;
+            metaSpan.textContent = `${dish.ingredients.length} ingredienti` + (dish.countOnce ? ' · conta una sola volta' : '');
 
             body.appendChild(nameSpan);
             body.appendChild(metaSpan);
@@ -1442,6 +1486,7 @@
         editNameInput.value = dish.name;
         ensureIngredientObjects(dish);
         editIngredientsInput.value = dish.ingredients.map(serializeIngredient).join('\n');
+        editCountOnceInput.checked = !!dish.countOnce;
         editModal.style.display = 'flex';
         editNameInput.focus();
       }
@@ -1491,6 +1536,7 @@
         }
         dish.name = name;
         dish.ingredients = ingredients;
+        dish.countOnce = !!editCountOnceInput.checked;
 
         saveState();
         renderDishes();
@@ -1721,12 +1767,17 @@
 
       function updateMenuIngredients() {
         const counts = {};
+        const countedOnceDishes = new Set();
 
         const addDishIngredients = (dishId) => {
           if (!dishId) return;
           const dish = state.dishes.primi.find(d => d.id === dishId)
             || state.dishes.secondi.find(d => d.id === dishId);
           if (!dish) return;
+          if (dish.countOnce) {
+            if (countedOnceDishes.has(dish.id)) return;
+            countedOnceDishes.add(dish.id);
+          }
           ensureIngredientObjects(dish);
           dish.ingredients.forEach(ing => {
             const name = (ing.name || '').trim();
