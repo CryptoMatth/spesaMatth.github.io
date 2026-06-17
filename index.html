@@ -924,13 +924,20 @@
                   <div class="col">
                     <select id="history-select"></select>
                   </div>
-                  <div class="col" style="flex:0 0 auto; display:flex; gap:0.4rem;">
-                    <button type="button" id="load-history-btn" class="btn-secondary">Carica in piano</button>
+                  <div class="col" style="flex:0 0 auto; display:flex; gap:0.4rem; flex-wrap:wrap;">
+                    <button type="button" id="preview-history-btn" class="btn-secondary">Mostra anteprima</button>
+                    <button type="button" id="apply-history-btn" class="btn-secondary">Copia nel piano corrente</button>
                   </div>
                 </div>
                 <p class="hint">
-                  Usa lo storico per rivedere o ripristinare un piano precedente. L'ultima settimana archiviata rimane la “scorsa settimana” usata per evitare di ripetere troppi piatti.
+                  Usa l’anteprima per confrontare il piano corrente con uno archiviato. “Copia nel piano corrente”
+                  sovrascrive il piano attuale con quello selezionato.
                 </p>
+              </div>
+
+              <div id="history-preview" style="margin-top:0.7rem; display:none;">
+                <h3>Settimana selezionata (anteprima)</h3>
+                <table id="history-table"></table>
               </div>
 
               <p class="hint" style="margin-top:0.6rem;">
@@ -993,10 +1000,8 @@
           if (!state.dishes.primi) state.dishes.primi = [];
           if (!state.dishes.secondi) state.dishes.secondi = [];
           if (!Array.isArray(state.shopping)) state.shopping = [];
-
           if (!Array.isArray(state.historyWeeks)) state.historyWeeks = [];
 
-          // migrazione da vecchio prevWeekPlan, se esiste
           if (state.prevWeekPlan && Object.keys(state.prevWeekPlan).length && state.historyWeeks.length === 0) {
             state.historyWeeks.push({
               id: uid(),
@@ -1052,7 +1057,7 @@
       const editCancelBtn = document.getElementById('edit-dish-cancel');
 
       let editingDishId = null;
-      let editingDishType = null; // 'primo' | 'secondo'
+      let editingDishType = null;
 
       function hashPin(pin) {
         return btoa(pin);
@@ -1180,7 +1185,6 @@
         });
       });
 
-      // Sub-tab menu (Piatti / Piano)
       const menuSubtabButtons = document.querySelectorAll('.menu-subtab-btn');
       const menuPiatti = document.getElementById('menu-piatti');
       const menuPiano = document.getElementById('menu-piano');
@@ -1259,7 +1263,6 @@
         }
       });
 
-      // DRAG & DROP ORDINAMENTO
       let draggedItem = null;
 
       shoppingListEl.addEventListener('dragstart', (e) => {
@@ -1698,7 +1701,10 @@
       const weekTable = document.getElementById('week-table');
       const archiveWeekBtn = document.getElementById('archive-week-btn');
       const historySelect = document.getElementById('history-select');
-      const loadHistoryBtn = document.getElementById('load-history-btn');
+      const previewHistoryBtn = document.getElementById('preview-history-btn');
+      const applyHistoryBtn = document.getElementById('apply-history-btn');
+      const historyPreview = document.getElementById('history-preview');
+      const historyTable = document.getElementById('history-table');
 
       function buildWeekTableSkeleton() {
         let html = '<thead><tr><th>Giorno</th><th>Pranzo</th><th>Cena</th></tr></thead><tbody>';
@@ -1823,6 +1829,8 @@
         const weeks = state.historyWeeks || [];
         if (!weeks.length) {
           historySelect.innerHTML = '<option value="">Nessuna settimana archiviata</option>';
+          historyPreview.style.display = 'none';
+          historyTable.innerHTML = '';
           return;
         }
         let options = '<option value="">Seleziona una settimana...</option>';
@@ -1833,7 +1841,70 @@
         historySelect.innerHTML = options;
       }
 
-      loadHistoryBtn.addEventListener('click', function() {
+      function renderHistoryPreview(weekPlan) {
+        if (!weekPlan) {
+          historyPreview.style.display = 'none';
+          historyTable.innerHTML = '';
+          return;
+        }
+        let html = '<thead><tr><th>Giorno</th><th>Pranzo</th><th>Cena</th></tr></thead><tbody>';
+        const getDishName = (dishId) => {
+          if (!dishId) return '';
+          const dish = state.dishes.primi.find(x => x.id === dishId)
+            || state.dishes.secondi.find(x => x.id === dishId);
+          return dish ? dish.name : '(eliminato)';
+        };
+        DAYS.forEach(d => {
+          const day = weekPlan[d.key] || { lunch: {}, dinner: {} };
+          const lunch = day.lunch || {};
+          const dinner = day.dinner || {};
+          html += `
+            <tr>
+              <th>${d.label}</th>
+              <td>
+                <div class="slot">
+                  <div class="slot-title">Primo</div>
+                  <div>${getDishName(lunch.primoId) || '—'}</div>
+                </div>
+                <div class="slot">
+                  <div class="slot-title">Secondo</div>
+                  <div>${getDishName(lunch.secondoId) || '—'}</div>
+                </div>
+              </td>
+              <td>
+                <div class="slot">
+                  <div class="slot-title">Primo</div>
+                  <div>${getDishName(dinner.primoId) || '—'}</div>
+                </div>
+                <div class="slot">
+                  <div class="slot-title">Secondo</div>
+                  <div>${getDishName(dinner.secondoId) || '—'}</div>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+        html += '</tbody>';
+        historyTable.innerHTML = html;
+        historyPreview.style.display = 'block';
+      }
+
+      previewHistoryBtn.addEventListener('click', function() {
+        const id = historySelect.value;
+        if (!id) {
+          renderHistoryPreview(null);
+          return;
+        }
+        const weeks = state.historyWeeks || [];
+        const week = weeks.find(w => w.id === id);
+        if (!week) {
+          renderHistoryPreview(null);
+          return;
+        }
+        renderHistoryPreview(week.weekPlan || defaultWeekPlan());
+      });
+
+      applyHistoryBtn.addEventListener('click', function() {
         const id = historySelect.value;
         if (!id) return;
         const weeks = state.historyWeeks || [];
