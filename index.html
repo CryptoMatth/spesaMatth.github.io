@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    /* Palette e base ispirate alla Casa App che hai allegato */
     :root {
       --primary:        #2B5540;
       --primary-light:  #3D7A5A;
@@ -34,9 +33,6 @@
 
       --shadow-soft: 0 6px 18px rgba(0,0,0,0.06);
       --shadow-chip: 0 2px 8px rgba(0,0,0,0.06);
-
-      --header-h: 54px;
-      --tab-h:    60px;
 
       --trans: 0.18s ease;
     }
@@ -87,8 +83,6 @@
       margin-bottom: 0.75rem;
       border: 1px solid rgba(0,0,0,0.02);
     }
-
-    /* HEADER */
 
     header {
       display: flex;
@@ -156,8 +150,6 @@
     button {
       font-family: inherit;
     }
-
-    /* TAB SWITCH (in alto, stile pillole) */
 
     .tabs {
       display: flex;
@@ -270,8 +262,6 @@
       min-width: min(100%, 260px);
     }
 
-    /* Pulsanti generici */
-
     .btn-primary {
       border-radius: var(--radius-sm);
       border: none;
@@ -338,8 +328,6 @@
       color: var(--text3);
       margin-top: 0.4rem;
     }
-
-    /* LISTA SPESA */
 
     .shopping-actions {
       display: flex;
@@ -468,8 +456,6 @@
       font-size: 13px;
       color: var(--text3);
     }
-
-    /* MENU: Piatti + Piano settimanale */
 
     .dish-list {
       list-style: none;
@@ -657,6 +643,42 @@
       margin-top: 4px;
     }
 
+    /* Modal modifica piatto */
+
+    #edit-dish-modal {
+      position: fixed;
+      inset: 0;
+      max-width: 520px;
+      margin: 0 auto;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 15;
+    }
+
+    #edit-dish-inner {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 16px 16px 14px;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.25);
+    }
+
+    #edit-dish-inner h3 {
+      margin-bottom: 0.3rem;
+    }
+
+    #edit-dish-buttons {
+      margin-top: 0.7rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
     @media (max-width: 600px) {
       header h1 { font-size: 18px; }
       .shopping-item-name { font-size: 14px; }
@@ -690,6 +712,31 @@
           </div>
           <p id="pin-error" class="error"></p>
         </div>
+      </div>
+    </div>
+
+    <!-- MODAL MODIFICA PIATTO -->
+    <div id="edit-dish-modal">
+      <div id="edit-dish-inner">
+        <h3>Modifica piatto</h3>
+        <form id="edit-dish-form">
+          <label for="edit-dish-name">Nome piatto</label>
+          <input type="text" id="edit-dish-name" required>
+
+          <label for="edit-dish-ingredients" style="margin-top:0.4rem;">
+            Ingredienti (uno per riga, opzionale quantità con “;”)
+          </label>
+          <textarea id="edit-dish-ingredients" placeholder="pasta; 200 g&#10;passata; 1 barattolo..."></textarea>
+
+          <p class="hint">
+            Formato suggerito: <code>ingrediente; quantità</code>, es. <code>pasta; 200 g</code>.
+          </p>
+
+          <div id="edit-dish-buttons">
+            <button type="button" id="edit-dish-cancel" class="btn-secondary">Annulla</button>
+            <button type="submit" class="btn-primary">Salva modifiche</button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -752,47 +799,58 @@
         </section>
 
         <!-- TAB MENU -->
-        <section id="tab-menu" class="card hidden">
-          <h2>Menu settimanale</h2>
+        <section id="tab-menu" class="hidden">
+          <!-- Card 1: gestione piatti -->
+          <div class="card">
+            <h2>Gestione piatti</h2>
+            <p class="hint">
+              Formato ingredienti: uno per riga, opzionale quantità dopo <code>;</code> (es. <code>pasta; 200 g</code>).
+            </p>
 
-          <div class="row" style="margin-top:0.4rem;">
-            <div class="col">
-              <h3>Primi (max 14)</h3>
-              <form id="add-primo-form" style="margin-bottom:0.5rem;">
-                <label for="primo-name">Nome piatto</label>
-                <input type="text" id="primo-name" required placeholder="es. Pasta al pomodoro">
+            <div class="row" style="margin-top:0.6rem;">
+              <div class="col">
+                <h3>Primi (max 14)</h3>
+                <form id="add-primo-form" style="margin-bottom:0.5rem;">
+                  <label for="primo-name">Nome piatto</label>
+                  <input type="text" id="primo-name" required placeholder="es. Pasta al pomodoro">
 
-                <label for="primo-ingredients" style="margin-top:0.4rem;">Ingredienti (uno per riga)</label>
-                <textarea id="primo-ingredients" placeholder="pasta&#10;passata di pomodoro&#10;olio..."></textarea>
+                  <label for="primo-ingredients" style="margin-top:0.4rem;">
+                    Ingredienti (uno per riga, opzionale quantità con “;”)
+                  </label>
+                  <textarea id="primo-ingredients" placeholder="pasta; 200 g&#10;passata; 1 barattolo..."></textarea>
 
-                <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
-                  <button type="submit" class="btn-secondary">Aggiungi primo</button>
-                </div>
-              </form>
+                  <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
+                    <button type="submit" class="btn-secondary">Aggiungi primo</button>
+                  </div>
+                </form>
 
-              <ul id="primi-list" class="dish-list"></ul>
-            </div>
+                <ul id="primi-list" class="dish-list"></ul>
+              </div>
 
-            <div class="col">
-              <h3>Secondi (max 14)</h3>
-              <form id="add-secondo-form" style="margin-bottom:0.5rem;">
-                <label for="secondo-name">Nome piatto</label>
-                <input type="text" id="secondo-name" required placeholder="es. Pollo e patate">
+              <div class="col">
+                <h3>Secondi (max 14)</h3>
+                <form id="add-secondo-form" style="margin-bottom:0.5rem;">
+                  <label for="secondo-name">Nome piatto</label>
+                  <input type="text" id="secondo-name" required placeholder="es. Pollo e patate">
 
-                <label for="secondo-ingredients" style="margin-top:0.4rem;">Ingredienti (uno per riga)</label>
-                <textarea id="secondo-ingredients" placeholder="pollo&#10;patate&#10;rosmarino..."></textarea>
+                  <label for="secondo-ingredients" style="margin-top:0.4rem;">
+                    Ingredienti (uno per riga, opzionale quantità con “;”)
+                  </label>
+                  <textarea id="secondo-ingredients" placeholder="pollo; 300 g&#10;patate; 500 g..."></textarea>
 
-                <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
-                  <button type="submit" class="btn-secondary">Aggiungi secondo</button>
-                </div>
-              </form>
+                  <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
+                    <button type="submit" class="btn-secondary">Aggiungi secondo</button>
+                  </div>
+                </form>
 
-              <ul id="secondi-list" class="dish-list"></ul>
+                <ul id="secondi-list" class="dish-list"></ul>
+              </div>
             </div>
           </div>
 
-          <div style="margin-top:0.9rem;">
-            <h3>Piano settimanale</h3>
+          <!-- Card 2: piano settimanale -->
+          <div class="card">
+            <h2>Piano settimanale</h2>
             <table id="week-table"></table>
             <div style="margin-top:0.5rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
               <p class="hint" style="margin:0;">
@@ -802,12 +860,13 @@
                 Archivia settimana corrente
               </button>
             </div>
-          </div>
 
-          <p class="hint" style="margin-top:0.6rem;">
-            Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa.
-            Togliendo il piatto, gli ingredienti collegati vengono rimossi se non servono ad altri piatti.
-          </p>
+            <p class="hint" style="margin-top:0.6rem;">
+              Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa
+              con il nome e la quantità indicata. Togliendo il piatto, gli ingredienti collegati vengono rimossi se non
+              servono ad altri piatti.
+            </p>
+          </div>
         </section>
       </main>
     </div>
@@ -902,6 +961,15 @@
       const exportBtn = document.getElementById('export-btn');
       const importBtn = document.getElementById('import-btn');
       const importFileInput = document.getElementById('import-file-input');
+
+      const editModal = document.getElementById('edit-dish-modal');
+      const editForm = document.getElementById('edit-dish-form');
+      const editNameInput = document.getElementById('edit-dish-name');
+      const editIngredientsInput = document.getElementById('edit-dish-ingredients');
+      const editCancelBtn = document.getElementById('edit-dish-cancel');
+
+      let editingDishId = null;
+      let editingDishType = null; // 'primo' | 'secondo'
 
       function hashPin(pin) {
         return btoa(pin);
@@ -1077,7 +1145,7 @@
         const item = state.shopping.find(it => it.id === id);
         if (!item) return;
 
-        if (e.target.matches('.purchase-checkbox') || e.target.closest('.check-circle')) {
+        if (e.target.matches('.purchase-checkbox') || e.target.closest('.purchase-checkbox')) {
           item.purchased = !item.purchased;
           saveState();
           renderShopping();
@@ -1126,9 +1194,8 @@
           const label = document.createElement('label');
 
           const check = document.createElement('div');
-          check.className = 'check-circle' + (item.purchased ? ' done' : '');
+          check.className = 'check-circle purchase-checkbox' + (item.purchased ? ' done' : '');
           check.innerHTML = item.purchased ? '✓' : '';
-          check.classList.add('purchase-checkbox');
 
           const textWrap = document.createElement('div');
           const nameSpan = document.createElement('div');
@@ -1192,6 +1259,34 @@
       const secondoNameInput = document.getElementById('secondo-name');
       const secondoIngredientsInput = document.getElementById('secondo-ingredients');
 
+      function parseIngredientLine(line) {
+        const parts = line.split(';');
+        const name = (parts[0] || '').trim();
+        const qty = (parts[1] || '').trim();
+        if (!name) return null;
+        return { name, qty };
+      }
+
+      function serializeIngredient(ing) {
+        const name = typeof ing === 'string' ? ing : (ing.name || '');
+        const qty = typeof ing === 'string' ? '' : (ing.qty || '');
+        return qty ? `${name}; ${qty}` : name;
+      }
+
+      function ensureIngredientObjects(dish) {
+        if (!Array.isArray(dish.ingredients)) {
+          dish.ingredients = [];
+          return;
+        }
+        dish.ingredients = dish.ingredients.map(ing => {
+          if (typeof ing === 'string') {
+            const parsed = parseIngredientLine(ing);
+            return parsed || { name: ing.trim(), qty: '' };
+          }
+          return { name: (ing.name || '').trim(), qty: (ing.qty || '').trim() };
+        });
+      }
+
       addPrimoForm.addEventListener('submit', function(e) {
         e.preventDefault();
         if (state.dishes.primi.length >= 14) {
@@ -1200,10 +1295,15 @@
         }
         const name = primoNameInput.value.trim();
         if (!name) return;
-        const ingredients = primoIngredientsInput.value
+        const ingredientsLines = primoIngredientsInput.value
           .split('\n')
           .map(s => s.trim())
           .filter(Boolean);
+        const ingredients = [];
+        ingredientsLines.forEach(line => {
+          const parsed = parseIngredientLine(line);
+          if (parsed) ingredients.push(parsed);
+        });
         state.dishes.primi.push({
           id: uid(),
           name,
@@ -1225,10 +1325,15 @@
         }
         const name = secondoNameInput.value.trim();
         if (!name) return;
-        const ingredients = secondoIngredientsInput.value
+        const ingredientsLines = secondoIngredientsInput.value
           .split('\n')
           .map(s => s.trim())
           .filter(Boolean);
+        const ingredients = [];
+        ingredientsLines.forEach(line => {
+          const parsed = parseIngredientLine(line);
+          if (parsed) ingredients.push(parsed);
+        });
         state.dishes.secondi.push({
           id: uid(),
           name,
@@ -1243,25 +1348,39 @@
       });
 
       primiListEl.addEventListener('click', function(e) {
-        if (!e.target.matches('.delete-dish-btn')) return;
-        const id = e.target.dataset.id;
-        state.dishes.primi = state.dishes.primi.filter(d => d.id !== id);
-        removeDishFromWeek(id);
-        saveState();
-        renderDishes();
-        renderWeekSelectors();
-        updateMenuIngredients();
+        if (e.target.matches('.delete-dish-btn')) {
+          const id = e.target.dataset.id;
+          state.dishes.primi = state.dishes.primi.filter(d => d.id !== id);
+          removeDishFromWeek(id);
+          saveState();
+          renderDishes();
+          renderWeekSelectors();
+          updateMenuIngredients();
+        } else if (e.target.matches('.edit-dish-btn')) {
+          const id = e.target.dataset.id;
+          const dish = state.dishes.primi.find(d => d.id === id);
+          if (!dish) return;
+          ensureIngredientObjects(dish);
+          openEditModal('primo', dish);
+        }
       });
 
       secondiListEl.addEventListener('click', function(e) {
-        if (!e.target.matches('.delete-dish-btn')) return;
-        const id = e.target.dataset.id;
-        state.dishes.secondi = state.dishes.secondi.filter(d => d.id !== id);
-        removeDishFromWeek(id);
-        saveState();
-        renderDishes();
-        renderWeekSelectors();
-        updateMenuIngredients();
+        if (e.target.matches('.delete-dish-btn')) {
+          const id = e.target.dataset.id;
+          state.dishes.secondi = state.dishes.secondi.filter(d => d.id !== id);
+          removeDishFromWeek(id);
+          saveState();
+          renderDishes();
+          renderWeekSelectors();
+          updateMenuIngredients();
+        } else if (e.target.matches('.edit-dish-btn')) {
+          const id = e.target.dataset.id;
+          const dish = state.dishes.secondi.find(d => d.id === id);
+          if (!dish) return;
+          ensureIngredientObjects(dish);
+          openEditModal('secondo', dish);
+        }
       });
 
       function renderDishes() {
@@ -1273,6 +1392,7 @@
           primiListEl.appendChild(li);
         } else {
           state.dishes.primi.forEach(dish => {
+            ensureIngredientObjects(dish);
             const li = document.createElement('li');
             li.className = 'dish-item';
 
@@ -1293,15 +1413,28 @@
             body.appendChild(nameSpan);
             body.appendChild(metaSpan);
 
+            const acts = document.createElement('div');
+            acts.style.display = 'flex';
+            acts.style.gap = '4px';
+
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'tiny-btn edit-dish-btn';
+            editBtn.dataset.id = dish.id;
+            editBtn.textContent = 'Mod';
+
             const delBtn = document.createElement('button');
             delBtn.type = 'button';
             delBtn.className = 'tiny-btn delete-dish-btn';
             delBtn.dataset.id = dish.id;
-            delBtn.textContent = 'Elimina';
+            delBtn.textContent = 'Del';
+
+            acts.appendChild(editBtn);
+            acts.appendChild(delBtn);
 
             li.appendChild(dot);
             li.appendChild(body);
-            li.appendChild(delBtn);
+            li.appendChild(acts);
 
             primiListEl.appendChild(li);
           });
@@ -1315,6 +1448,7 @@
           secondiListEl.appendChild(li);
         } else {
           state.dishes.secondi.forEach(dish => {
+            ensureIngredientObjects(dish);
             const li = document.createElement('li');
             li.className = 'dish-item';
 
@@ -1335,15 +1469,28 @@
             body.appendChild(nameSpan);
             body.appendChild(metaSpan);
 
+            const acts = document.createElement('div');
+            acts.style.display = 'flex';
+            acts.style.gap = '4px';
+
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'tiny-btn edit-dish-btn';
+            editBtn.dataset.id = dish.id;
+            editBtn.textContent = 'Mod';
+
             const delBtn = document.createElement('button');
             delBtn.type = 'button';
             delBtn.className = 'tiny-btn delete-dish-btn';
             delBtn.dataset.id = dish.id;
-            delBtn.textContent = 'Elimina';
+            delBtn.textContent = 'Del';
+
+            acts.appendChild(editBtn);
+            acts.appendChild(delBtn);
 
             li.appendChild(dot);
             li.appendChild(body);
-            li.appendChild(delBtn);
+            li.appendChild(acts);
 
             secondiListEl.appendChild(li);
           });
@@ -1359,6 +1506,69 @@
           });
         });
       }
+
+      function openEditModal(type, dish) {
+        editingDishId = dish.id;
+        editingDishType = type;
+        editNameInput.value = dish.name;
+        ensureIngredientObjects(dish);
+        editIngredientsInput.value = dish.ingredients.map(serializeIngredient).join('\n');
+        editModal.style.display = 'flex';
+        editNameInput.focus();
+      }
+
+      function closeEditModal() {
+        editingDishId = null;
+        editingDishType = null;
+        editModal.style.display = 'none';
+      }
+
+      editCancelBtn.addEventListener('click', function() {
+        closeEditModal();
+      });
+
+      editModal.addEventListener('click', function(e) {
+        if (e.target === editModal) {
+          closeEditModal();
+        }
+      });
+
+      editForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!editingDishId || !editingDishType) {
+          closeEditModal();
+          return;
+        }
+        const name = editNameInput.value.trim();
+        if (!name) {
+          alert('Inserisci un nome per il piatto.');
+          return;
+        }
+        const ingredientsLines = editIngredientsInput.value
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean);
+        const ingredients = [];
+        ingredientsLines.forEach(line => {
+          const parsed = parseIngredientLine(line);
+          if (parsed) ingredients.push(parsed);
+        });
+
+        const list = editingDishType === 'primo' ? state.dishes.primi : state.dishes.secondi;
+        const dish = list.find(d => d.id === editingDishId);
+        if (!dish) {
+          closeEditModal();
+          return;
+        }
+        dish.name = name;
+        dish.ingredients = ingredients;
+
+        saveState();
+        renderDishes();
+        renderWeekSelectors();
+        updateMenuIngredients();
+        closeEditModal();
+      });
 
       const weekTable = document.getElementById('week-table');
       const archiveWeekBtn = document.getElementById('archive-week-btn');
@@ -1476,13 +1686,14 @@
           if (!dishId) return;
           const dish = state.dishes.primi.find(d => d.id === dishId)
             || state.dishes.secondi.find(d => d.id === dishId);
-          if (!dish || !dish.ingredients) return;
-          dish.ingredients.forEach(rawIng => {
-            const trimmed = rawIng.trim();
-            if (!trimmed) return;
-            const key = trimmed.toLowerCase();
+          if (!dish) return;
+          ensureIngredientObjects(dish);
+          dish.ingredients.forEach(ing => {
+            const name = (ing.name || '').trim();
+            if (!name) return;
+            const key = name.toLowerCase();
             if (!counts[key]) {
-              counts[key] = { count: 0, display: trimmed };
+              counts[key] = { count: 0, name, qty: ing.qty || '' };
             }
             counts[key].count += 1;
           });
@@ -1501,16 +1712,19 @@
         state.shopping = state.shopping.filter(it => !it.fromMenu || counts[it.ingredientKey]);
 
         Object.keys(counts).forEach(key => {
+          const data = counts[key];
           const existing = state.shopping.find(it => it.fromMenu && it.ingredientKey === key);
           if (!existing) {
             state.shopping.push({
               id: uid(),
-              name: counts[key].display,
-              quantity: '',
+              name: data.name,
+              quantity: data.qty,
               purchased: false,
               fromMenu: true,
               ingredientKey: key
             });
+          } else {
+            existing.quantity = data.qty;
           }
         });
       }
