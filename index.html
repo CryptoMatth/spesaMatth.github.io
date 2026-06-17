@@ -151,9 +151,7 @@
       transform: scale(0.93);
     }
 
-    button {
-      font-family: inherit;
-    }
+    button { font-family: inherit; }
 
     .tabs {
       display: flex;
@@ -270,9 +268,7 @@
     }
 
     input::placeholder,
-    textarea::placeholder {
-      color: var(--text3);
-    }
+    textarea::placeholder { color: var(--text3); }
 
     input:focus,
     textarea:focus,
@@ -286,16 +282,8 @@
       min-height: 3.5rem;
     }
 
-    .row {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-    }
-
-    .row > .col {
-      flex: 1;
-      min-width: min(100%, 260px);
-    }
+    .row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .row > .col { flex: 1; min-width: min(100%, 260px); }
 
     .btn-primary {
       border-radius: var(--radius-sm);
@@ -312,7 +300,6 @@
       gap: 6px;
       transition: background var(--trans), transform 0.12s ease;
     }
-
     .btn-primary:active {
       background: var(--primary-dark);
       transform: scale(0.97);
@@ -333,7 +320,6 @@
       gap: 6px;
       transition: all var(--trans);
     }
-
     .btn-secondary:active {
       background: var(--border);
     }
@@ -353,7 +339,6 @@
       gap: 6px;
       transition: background var(--trans);
     }
-
     .btn-danger:active {
       background: #FEE2E2;
     }
@@ -392,17 +377,12 @@
       gap: 6px;
       transition: opacity var(--trans), background var(--trans), border-color var(--trans), transform 0.15s ease;
     }
-
     .shopping-item.menu {
       border-left-color: var(--accent);
       background: var(--accent-bg);
       border-color: var(--accent-border);
     }
-
-    .shopping-item.purchased {
-      opacity: 0.55;
-    }
-
+    .shopping-item.purchased { opacity: 0.55; }
     .shopping-item.dragging {
       opacity: 0.7;
       transform: scale(0.98);
@@ -418,10 +398,7 @@
       cursor: grab;
       user-select: none;
     }
-
-    .shopping-item.dragging .drag-handle {
-      cursor: grabbing;
-    }
+    .shopping-item.dragging .drag-handle { cursor: grabbing; }
 
     .shopping-item label {
       display: flex;
@@ -446,7 +423,6 @@
       color: transparent;
       transition: all 0.15s ease;
     }
-
     .check-circle.done {
       background: var(--success);
       border-color: var(--success);
@@ -460,13 +436,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .shopping-item-qty {
       font-size: 12px;
       color: var(--text2);
       margin-top: 1px;
     }
-
     .shopping-item-source {
       font-size: 11px;
       color: var(--accent);
@@ -494,12 +468,10 @@
       font-size: 13px;
       transition: background var(--trans), color var(--trans), transform 0.12s ease;
     }
-
     .tiny-btn:active {
       background: var(--border);
       transform: scale(0.95);
     }
-
     .tiny-btn.del:active {
       background: #FEE2E2;
       color: var(--danger);
@@ -542,10 +514,7 @@
     .dish-type-dot.primo { background: #3B82F6; }
     .dish-type-dot.secondo { background: var(--accent); }
 
-    .dish-body {
-      flex: 1;
-      min-width: 0;
-    }
+    .dish-body { flex: 1; min-width: 0; }
 
     .dish-item-name {
       font-size: 14px;
@@ -554,7 +523,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .dish-item-meta {
       font-size: 11px;
       color: var(--text3);
@@ -577,7 +545,6 @@
       padding: 6px 6px;
       vertical-align: top;
     }
-
     th {
       background: var(--surface);
       text-align: left;
@@ -586,10 +553,7 @@
       font-weight: 700;
       color: var(--text2);
     }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
+    tr:last-child td { border-bottom: none; }
 
     .slot-title {
       font-weight: 600;
@@ -599,15 +563,8 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-
-    .slot {
-      margin-bottom: 4px;
-    }
-
-    .slot select {
-      font-size: 12px;
-      padding: 6px 7px;
-    }
+    .slot { margin-bottom: 4px; }
+    .slot select { font-size: 12px; padding: 6px 7px; }
 
     #edit-dish-modal {
       position: fixed;
@@ -621,7 +578,6 @@
       padding: 20px;
       z-index: 15;
     }
-
     #edit-dish-inner {
       width: 100%;
       max-width: 440px;
@@ -630,11 +586,7 @@
       padding: 16px 16px 14px;
       box-shadow: 0 14px 40px rgba(0,0,0,0.25);
     }
-
-    #edit-dish-inner h3 {
-      margin-bottom: 0.3rem;
-    }
-
+    #edit-dish-inner h3 { margin-bottom: 0.3rem; }
     #edit-dish-buttons {
       margin-top: 0.7rem;
       display: flex;
@@ -826,44 +778,34 @@
 
             <div id="menu-piano" class="hidden">
               <h2>Piano settimanale</h2>
-              <table id="week-table"></table>
 
-              <div style="margin-top:0.5rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-                <p class="hint" style="margin:0;">
-                  L'ultima settimana archiviata viene usata per mostrare “(scorsa settimana)” nei menu a tendina.
+              <h3>Settimana corrente</h3>
+              <table id="week-table-current"></table>
+
+              <div style="margin-top:0.5rem;">
+                <p class="hint">
+                  Gli ingredienti per la spesa sono calcolati solo dalla settimana corrente.
+                  I piatti già usati il massimo consentito o mangiati la settimana precedente
+                  appaiono in fondo alla lista e in grigio.
                 </p>
-                <button type="button" id="archive-week-btn" class="btn-secondary">
-                  Archivia settimana corrente
-                </button>
               </div>
 
-              <div style="margin-top:0.75rem;">
-                <label for="history-select">Storico settimane</label>
-                <div class="row" style="margin-top:0.25rem; align-items:flex-end;">
-                  <div class="col">
-                    <select id="history-select"></select>
-                  </div>
-                  <div class="col" style="flex:0 0 auto; display:flex; gap:0.4rem; flex-wrap:wrap;">
-                    <button type="button" id="preview-history-btn" class="btn-secondary">Mostra anteprima</button>
-                    <button type="button" id="apply-history-btn" class="btn-secondary">Copia nel piano corrente</button>
-                  </div>
+              <div style="margin-top:1rem;">
+                <h3>Settimana precedente (solo riferimento)</h3>
+                <table id="week-table-prev"></table>
+                <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
+                  <button type="button" id="copy-current-to-prev-btn" class="btn-secondary">
+                    Copia settimana corrente in settimana precedente
+                  </button>
+                  <button type="button" id="clear-prev-week-btn" class="btn-secondary">
+                    Svuota settimana precedente
+                  </button>
                 </div>
                 <p class="hint">
-                  Usa l’anteprima per confrontare il piano corrente con uno archiviato. “Copia nel piano corrente”
-                  sovrascrive il piano attuale con quello selezionato.
+                  Modifica qui la settimana precedente senza toccare la corrente.
+                  Le etichette “(settimana scorsa)” si basano su questa tabella.
                 </p>
               </div>
-
-              <div id="history-preview" style="margin-top:0.7rem; display:none;">
-                <h3>Settimana selezionata (anteprima)</h3>
-                <table id="history-table"></table>
-              </div>
-
-              <p class="hint" style="margin-top:0.6rem;">
-                Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa
-                con nome e quantità indicata. Se lo stesso ingrediente appare più volte nella settimana, vedrai il moltiplicatore (×2, ×3, ...),
-                a meno che tu abbia scelto di contarli una sola volta.
-              </p>
             </div>
           </div>
         </section>
@@ -874,7 +816,6 @@
   <script>
     (function() {
       const STORAGE_KEY = 'mr_spesa_menu_state_v1';
-
       const DAYS = [
         { key: 'lun', label: 'Lunedì' },
         { key: 'mar', label: 'Martedì' },
@@ -899,7 +840,8 @@
       let state = {
         shopping: [],
         dishes: { primi: [], secondi: [] },
-        weekPlan: defaultWeekPlan(),
+        weekPlanCurrent: defaultWeekPlan(),
+        weekPlanPrev: defaultWeekPlan(),
         historyWeeks: []
       };
 
@@ -914,21 +856,27 @@
           const parsed = JSON.parse(raw);
           state = Object.assign({}, state, parsed);
 
-          if (!state.weekPlan) state.weekPlan = defaultWeekPlan();
+          if (!state.weekPlanCurrent && state.weekPlan) {
+            state.weekPlanCurrent = state.weekPlan;
+          }
+          if (!state.weekPlanCurrent) state.weekPlanCurrent = defaultWeekPlan();
+
+          if (!state.weekPlanPrev) {
+            if (state.historyWeeks && state.historyWeeks.length > 0) {
+              const last = state.historyWeeks[state.historyWeeks.length - 1];
+              state.weekPlanPrev = last.weekPlan || defaultWeekPlan();
+            } else if (state.prevWeekPlan) {
+              state.weekPlanPrev = state.prevWeekPlan;
+            } else {
+              state.weekPlanPrev = defaultWeekPlan();
+            }
+          }
+
           if (!state.dishes) state.dishes = { primi: [], secondi: [] };
           if (!state.dishes.primi) state.dishes.primi = [];
           if (!state.dishes.secondi) state.dishes.secondi = [];
           if (!Array.isArray(state.shopping)) state.shopping = [];
           if (!Array.isArray(state.historyWeeks)) state.historyWeeks = [];
-
-          if (state.prevWeekPlan && Object.keys(state.prevWeekPlan).length && state.historyWeeks.length === 0) {
-            state.historyWeeks.push({
-              id: uid(),
-              label: 'Settimana precedente (importata)',
-              createdAt: new Date().toISOString(),
-              weekPlan: state.prevWeekPlan
-            });
-          }
 
           state.dishes.primi.forEach(d => {
             if (d.countOnce === undefined) d.countOnce = false;
@@ -983,7 +931,7 @@
       exportBtn.addEventListener('click', function() {
         const payload = {
           state,
-          version: 4,
+          version: 6,
           exportedAt: new Date().toISOString()
         };
         downloadJSON(payload, 'spesa-menu-backup.json');
@@ -1016,7 +964,22 @@
 
             state = Object.assign({}, state, newState);
 
-            if (!state.weekPlan) state.weekPlan = defaultWeekPlan();
+            if (!state.weekPlanCurrent && state.weekPlan) {
+              state.weekPlanCurrent = state.weekPlan;
+            }
+            if (!state.weekPlanCurrent) state.weekPlanCurrent = defaultWeekPlan();
+
+            if (!state.weekPlanPrev) {
+              if (state.historyWeeks && state.historyWeeks.length > 0) {
+                const last = state.historyWeeks[state.historyWeeks.length - 1];
+                state.weekPlanPrev = last.weekPlan || defaultWeekPlan();
+              } else if (state.prevWeekPlan) {
+                state.weekPlanPrev = state.prevWeekPlan;
+              } else {
+                state.weekPlanPrev = defaultWeekPlan();
+              }
+            }
+
             if (!state.dishes) state.dishes = { primi: [], secondi: [] };
             if (!state.dishes.primi) state.dishes.primi = [];
             if (!state.dishes.secondi) state.dishes.secondi = [];
@@ -1316,7 +1279,8 @@
         primoMaxTwoInput.checked = false;
         saveState();
         renderDishes();
-        renderWeekSelectors();
+        renderWeekSelectorsCurrent();
+        renderWeekSelectorsPrev();
         updateMenuIngredients();
       });
 
@@ -1346,7 +1310,8 @@
         secondoMaxTwoInput.checked = false;
         saveState();
         renderDishes();
-        renderWeekSelectors();
+        renderWeekSelectorsCurrent();
+        renderWeekSelectorsPrev();
         updateMenuIngredients();
       });
 
@@ -1357,7 +1322,8 @@
           removeDishFromWeek(id);
           saveState();
           renderDishes();
-          renderWeekSelectors();
+          renderWeekSelectorsCurrent();
+          renderWeekSelectorsPrev();
           updateMenuIngredients();
         } else if (e.target.matches('.edit-dish-btn')) {
           const id = e.target.dataset.id;
@@ -1375,7 +1341,8 @@
           removeDishFromWeek(id);
           saveState();
           renderDishes();
-          renderWeekSelectors();
+          renderWeekSelectorsCurrent();
+          renderWeekSelectorsPrev();
           updateMenuIngredients();
         } else if (e.target.matches('.edit-dish-btn')) {
           const id = e.target.dataset.id;
@@ -1511,13 +1478,18 @@
       }
 
       function removeDishFromWeek(dishId) {
-        Object.keys(state.weekPlan).forEach(dayKey => {
-          const day = state.weekPlan[dayKey];
-          ['lunch','dinner'].forEach(meal => {
-            if (day[meal].primoId === dishId) day[meal].primoId = null;
-            if (day[meal].secondoId === dishId) day[meal].secondoId = null;
+        function clearInPlan(plan) {
+          Object.keys(plan).forEach(dayKey => {
+            const day = plan[dayKey];
+            ['lunch','dinner'].forEach(meal => {
+              if (!day[meal]) return;
+              if (day[meal].primoId === dishId) day[meal].primoId = null;
+              if (day[meal].secondoId === dishId) day[meal].secondoId = null;
+            });
           });
-        });
+        }
+        clearInPlan(state.weekPlanCurrent);
+        clearInPlan(state.weekPlanPrev);
       }
 
       function openEditModal(type, dish) {
@@ -1582,20 +1554,18 @@
 
         saveState();
         renderDishes();
-        renderWeekSelectors();
+        renderWeekSelectorsCurrent();
+        renderWeekSelectorsPrev();
         updateMenuIngredients();
         closeEditModal();
       });
 
-      const weekTable = document.getElementById('week-table');
-      const archiveWeekBtn = document.getElementById('archive-week-btn');
-      const historySelect = document.getElementById('history-select');
-      const previewHistoryBtn = document.getElementById('preview-history-btn');
-      const applyHistoryBtn = document.getElementById('apply-history-btn');
-      const historyPreview = document.getElementById('history-preview');
-      const historyTable = document.getElementById('history-table');
+      const weekTableCurrent = document.getElementById('week-table-current');
+      const weekTablePrev = document.getElementById('week-table-prev');
+      const copyCurrentToPrevBtn = document.getElementById('copy-current-to-prev-btn');
+      const clearPrevWeekBtn = document.getElementById('clear-prev-week-btn');
 
-      function buildWeekTableSkeleton() {
+      function buildWeekTableSkeleton(table, selectClass) {
         let html = '<thead><tr><th>Giorno</th><th>Pranzo</th><th>Cena</th></tr></thead><tbody>';
         DAYS.forEach(d => {
           html += `
@@ -1604,38 +1574,35 @@
               <td>
                 <div class="slot">
                   <div class="slot-title">Primo</div>
-                  <select class="dish-select" data-day="${d.key}" data-meal="lunch" data-course="primo"></select>
+                  <select class="${selectClass}" data-day="${d.key}" data-meal="lunch" data-course="primo"></select>
                 </div>
                 <div class="slot">
                   <div class="slot-title">Secondo</div>
-                  <select class="dish-select" data-day="${d.key}" data-meal="lunch" data-course="secondo"></select>
+                  <select class="${selectClass}" data-day="${d.key}" data-meal="lunch" data-course="secondo"></select>
                 </div>
               </td>
               <td>
                 <div class="slot">
                   <div class="slot-title">Primo</div>
-                  <select class="dish-select" data-day="${d.key}" data-meal="dinner" data-course="primo"></select>
+                  <select class="${selectClass}" data-day="${d.key}" data-meal="dinner" data-course="primo"></select>
                 </div>
                 <div class="slot">
                   <div class="slot-title">Secondo</div>
-                  <select class="dish-select" data-day="${d.key}" data-meal="dinner" data-course="secondo"></select>
+                  <select class="${selectClass}" data-day="${d.key}" data-meal="dinner" data-course="secondo"></select>
                 </div>
               </td>
             </tr>
           `;
         });
         html += '</tbody>';
-        weekTable.innerHTML = html;
+        table.innerHTML = html;
       }
 
       function getPrevWeekDishIdsSet() {
         const set = new Set();
-        const history = state.historyWeeks || [];
-        if (history.length === 0) return set;
-        const last = history[history.length - 1];
-        const prev = last.weekPlan || {};
-        Object.keys(prev).forEach(dayKey => {
-          const day = prev[dayKey];
+        const plan = state.weekPlanPrev || {};
+        Object.keys(plan).forEach(dayKey => {
+          const day = plan[dayKey];
           if (!day) return;
           ['lunch','dinner'].forEach(meal => {
             if (!day[meal]) return;
@@ -1649,8 +1616,9 @@
       function getDishCurrentWeekCount(dishId) {
         if (!dishId) return 0;
         let c = 0;
-        Object.keys(state.weekPlan).forEach(dayKey => {
-          const day = state.weekPlan[dayKey];
+        const plan = state.weekPlanCurrent || {};
+        Object.keys(plan).forEach(dayKey => {
+          const day = plan[dayKey];
           if (!day) return;
           ['lunch','dinner'].forEach(meal => {
             if (!day[meal]) return;
@@ -1660,14 +1628,15 @@
         return c;
       }
 
-      function renderWeekSelectors() {
+      function renderWeekSelectorsCurrent() {
         const prevSet = getPrevWeekDishIdsSet();
-        const selects = weekTable.querySelectorAll('.dish-select');
+        const selects = weekTableCurrent.querySelectorAll('.dish-select-current');
         selects.forEach(sel => {
           const course = sel.dataset.course;
           const dayKey = sel.dataset.day;
           const meal = sel.dataset.meal;
-          const day = state.weekPlan[dayKey];
+          const plan = state.weekPlanCurrent;
+          const day = plan[dayKey];
           if (!day) return;
           const currentId = (course === 'primo')
             ? day[meal].primoId
@@ -1683,7 +1652,7 @@
           dishes.forEach(d => {
             const countWeek = getDishCurrentWeekCount(d.id);
             const maxWeek = d.maxPerWeek || 1;
-            const overCurrent = countWeek >= maxWeek;
+            const overLimit = countWeek >= maxWeek;
             const wasPrev = prevSet.has(d.id);
 
             const tags = [];
@@ -1693,7 +1662,7 @@
             let label = d.name;
             if (tags.length) label += ' (' + tags.join(', ') + ')';
 
-            const isMuted = overCurrent || wasPrev;
+            const isMuted = overLimit || wasPrev;
             const optHtml = `<option value="${d.id}"${isMuted ? ' style="color:#A1A1AA;"' : ''}>${label}</option>`;
 
             if (isMuted) mutedOptions.push(optHtml);
@@ -1713,15 +1682,47 @@
         });
       }
 
-      weekTable.addEventListener('change', function(e) {
-        if (!e.target.matches('.dish-select')) return;
+      function renderWeekSelectorsPrev() {
+        const selects = weekTablePrev.querySelectorAll('.dish-select-prev');
+        selects.forEach(sel => {
+          const course = sel.dataset.course;
+          const dayKey = sel.dataset.day;
+          const meal = sel.dataset.meal;
+          const plan = state.weekPlanPrev;
+          const day = plan[dayKey];
+          if (!day) return;
+          const currentId = (course === 'primo')
+            ? day[meal].primoId
+            : day[meal].secondoId;
+
+          const dishes = course === 'primo'
+            ? state.dishes.primi
+            : state.dishes.secondi;
+
+          let optionsHtml = '<option value="">(nessuno)</option>';
+          optionsHtml += '<option value="__niente">Niente</option>';
+          optionsHtml += '<option value="__fuori">Fuori</option>';
+          dishes.forEach(d => {
+            optionsHtml += `<option value="${d.id}">${d.name}</option>`;
+          });
+
+          sel.innerHTML = optionsHtml;
+          if (currentId !== null && currentId !== undefined) {
+            sel.value = currentId;
+          }
+        });
+      }
+
+      weekTableCurrent.addEventListener('change', function(e) {
+        if (!e.target.matches('.dish-select-current')) return;
         const sel = e.target;
         const dayKey = sel.dataset.day;
         const meal = sel.dataset.meal;
         const course = sel.dataset.course;
         const value = sel.value || null;
 
-        const day = state.weekPlan[dayKey];
+        const plan = state.weekPlanCurrent;
+        const day = plan[dayKey];
         if (!day) return;
 
         if (course === 'primo') {
@@ -1732,118 +1733,44 @@
         updateMenuIngredients();
         saveState();
         renderShopping();
-        renderWeekSelectors();
+        renderWeekSelectorsCurrent();
       });
 
-      archiveWeekBtn.addEventListener('click', function() {
-        if (!confirm('Archiviare la settimana corrente come nuova voce nello storico e azzerare il piano?')) return;
-        const now = new Date();
-        const label = `Settimana del ${now.toLocaleDateString('it-IT')}`;
-        if (!Array.isArray(state.historyWeeks)) state.historyWeeks = [];
-        state.historyWeeks.push({
-          id: uid(),
-          label,
-          createdAt: now.toISOString(),
-          weekPlan: JSON.parse(JSON.stringify(state.weekPlan))
-        });
-        state.weekPlan = defaultWeekPlan();
-        updateMenuIngredients();
+      weekTablePrev.addEventListener('change', function(e) {
+        if (!e.target.matches('.dish-select-prev')) return;
+        const sel = e.target;
+        const dayKey = sel.dataset.day;
+        const meal = sel.dataset.meal;
+        const course = sel.dataset.course;
+        const value = sel.value || null;
+
+        const plan = state.weekPlanPrev;
+        const day = plan[dayKey];
+        if (!day) return;
+
+        if (course === 'primo') {
+          day[meal].primoId = value;
+        } else {
+          day[meal].secondoId = value;
+        }
         saveState();
-        renderWeekSelectors();
-        renderHistorySelect();
+        renderWeekSelectorsCurrent();
       });
 
-      function renderHistorySelect() {
-        const weeks = state.historyWeeks || [];
-        if (!weeks.length) {
-          historySelect.innerHTML = '<option value="">Nessuna settimana archiviata</option>';
-          historyPreview.style.display = 'none';
-          historyTable.innerHTML = '';
-          return;
-        }
-        let options = '<option value="">Seleziona una settimana...</option>';
-        weeks.slice().reverse().forEach(w => {
-          const label = w.label || (w.createdAt ? new Date(w.createdAt).toLocaleDateString('it-IT') : 'Settimana');
-          options += `<option value="${w.id}">${label}</option>`;
-        });
-        historySelect.innerHTML = options;
-      }
-
-      function renderHistoryPreview(weekPlan) {
-        if (!weekPlan) {
-          historyPreview.style.display = 'none';
-          historyTable.innerHTML = '';
-          return;
-        }
-        let html = '<thead><tr><th>Giorno</th><th>Pranzo</th><th>Cena</th></tr></thead><tbody>';
-        const getDishName = (dishId) => {
-          if (!dishId || dishId === '__niente' || dishId === '__fuori') return dishId === '__niente' ? 'Niente' : (dishId === '__fuori' ? 'Fuori' : '');
-          const dish = state.dishes.primi.find(x => x.id === dishId)
-            || state.dishes.secondi.find(x => x.id === dishId);
-          return dish ? dish.name : '(eliminato)';
-        };
-        DAYS.forEach(d => {
-          const day = weekPlan[d.key] || { lunch: {}, dinner: {} };
-          const lunch = day.lunch || {};
-          const dinner = day.dinner || {};
-          html += `
-            <tr>
-              <th>${d.label}</th>
-              <td>
-                <div class="slot">
-                  <div class="slot-title">Primo</div>
-                  <div>${getDishName(lunch.primoId) || '—'}</div>
-                </div>
-                <div class="slot">
-                  <div class="slot-title">Secondo</div>
-                  <div>${getDishName(lunch.secondoId) || '—'}</div>
-                </div>
-              </td>
-              <td>
-                <div class="slot">
-                  <div class="slot-title">Primo</div>
-                  <div>${getDishName(dinner.primoId) || '—'}</div>
-                </div>
-                <div class="slot">
-                  <div class="slot-title">Secondo</div>
-                  <div>${getDishName(dinner.secondoId) || '—'}</div>
-                </div>
-              </td>
-            </tr>
-          `;
-        });
-        html += '</tbody>';
-        historyTable.innerHTML = html;
-        historyPreview.style.display = 'block';
-      }
-
-      previewHistoryBtn.addEventListener('click', function() {
-        const id = historySelect.value;
-        if (!id) {
-          renderHistoryPreview(null);
-          return;
-        }
-        const weeks = state.historyWeeks || [];
-        const week = weeks.find(w => w.id === id);
-        if (!week) {
-          renderHistoryPreview(null);
-          return;
-        }
-        renderHistoryPreview(week.weekPlan || defaultWeekPlan());
-      });
-
-      applyHistoryBtn.addEventListener('click', function() {
-        const id = historySelect.value;
-        if (!id) return;
-        const weeks = state.historyWeeks || [];
-        const week = weeks.find(w => w.id === id);
-        if (!week) return;
-        if (!confirm('Sostituire il piano settimanale corrente con quello archiviato selezionato?')) return;
-        state.weekPlan = JSON.parse(JSON.stringify(week.weekPlan || defaultWeekPlan()));
-        updateMenuIngredients();
+      copyCurrentToPrevBtn.addEventListener('click', function() {
+        if (!confirm('Copiare la settimana corrente nella settimana precedente?')) return;
+        state.weekPlanPrev = JSON.parse(JSON.stringify(state.weekPlanCurrent));
         saveState();
-        renderWeekSelectors();
-        renderShopping();
+        renderWeekSelectorsPrev();
+        renderWeekSelectorsCurrent();
+      });
+
+      clearPrevWeekBtn.addEventListener('click', function() {
+        if (!confirm('Svuotare completamente la settimana precedente?')) return;
+        state.weekPlanPrev = defaultWeekPlan();
+        saveState();
+        renderWeekSelectorsPrev();
+        renderWeekSelectorsCurrent();
       });
 
       function updateMenuIngredients() {
@@ -1876,8 +1803,9 @@
           });
         };
 
-        Object.keys(state.weekPlan).forEach(dayKey => {
-          const day = state.weekPlan[dayKey];
+        const plan = state.weekPlanCurrent || {};
+        Object.keys(plan).forEach(dayKey => {
+          const day = plan[dayKey];
           if (!day) return;
           ['lunch','dinner'].forEach(meal => {
             if (!day[meal]) return;
@@ -1912,11 +1840,16 @@
         });
       }
 
+      function buildWeekTables() {
+        buildWeekTableSkeleton(weekTableCurrent, 'dish-select-current');
+        buildWeekTableSkeleton(weekTablePrev, 'dish-select-prev');
+      }
+
       function renderAll() {
-        buildWeekTableSkeleton();
+        buildWeekTables();
         renderDishes();
-        renderWeekSelectors();
-        renderHistorySelect();
+        renderWeekSelectorsCurrent();
+        renderWeekSelectorsPrev();
         updateMenuIngredients();
         saveState();
         renderShopping();
