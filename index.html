@@ -354,8 +354,8 @@
       padding: 10px 11px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      transition: opacity var(--trans), background var(--trans), border-color var(--trans);
+      gap: 6px;
+      transition: opacity var(--trans), background var(--trans), border-color var(--trans), transform 0.15s ease;
     }
 
     .shopping-item.menu {
@@ -366,6 +366,26 @@
 
     .shopping-item.purchased {
       opacity: 0.55;
+    }
+
+    .shopping-item.dragging {
+      opacity: 0.7;
+      transform: scale(0.98);
+    }
+
+    .drag-handle {
+      width: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text3);
+      font-size: 16px;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .shopping-item.dragging .drag-handle {
+      cursor: grabbing;
     }
 
     .shopping-item label {
@@ -554,8 +574,6 @@
       padding: 6px 7px;
     }
 
-    /* Schermata lock */
-
     #lock-screen {
       position: fixed;
       inset: 0;
@@ -642,8 +660,6 @@
       text-align: center;
       margin-top: 4px;
     }
-
-    /* Modal modifica piatto */
 
     #edit-dish-modal {
       position: fixed;
@@ -794,7 +810,7 @@
 
           <ul id="shopping-list"></ul>
           <p class="hint">
-            Gli ingredienti aggiunti automaticamente dal menu sono evidenziati e indicati come “dal menu”.
+            Gli ingredienti aggiunti automaticamente dal menu mostrano il nome del piatto e, se serve più volte, un moltiplicatore (es. ×2).
           </p>
         </section>
 
@@ -863,8 +879,7 @@
 
             <p class="hint" style="margin-top:0.6rem;">
               Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa
-              con il nome e la quantità indicata. Togliendo il piatto, gli ingredienti collegati vengono rimossi se non
-              servono ad altri piatti.
+              con nome e quantità indicata. Se lo stesso ingrediente appare più volte nella settimana, vedrai il moltiplicatore (×2, ×3, ...).
             </p>
           </div>
         </section>
@@ -1115,7 +1130,9 @@
           quantity: qty,
           purchased: false,
           fromMenu: false,
-          ingredientKey: null
+          ingredientKey: null,
+          menuDishName: null,
+          menuUsageCount: 0
         });
         itemNameInput.value = '';
         itemQtyInput.value = '';
@@ -1138,6 +1155,7 @@
         renderShopping();
       });
 
+      // CLICK (check/delete)
       shoppingListEl.addEventListener('click', function(e) {
         const li = e.target.closest('.shopping-item');
         if (!li) return;
@@ -1151,29 +1169,56 @@
           renderShopping();
         } else if (e.target.matches('.delete-item-btn') || e.target.closest('.delete-item-btn')) {
           if (item.fromMenu) {
-            if (!confirm('Questo ingrediente è collegato al menu. Vuoi eliminarlo comunque?')) return;
+            if (!confirm('Questo ingrediente proviene dal menu. Vuoi eliminarlo comunque?')) return;
           }
           state.shopping = state.shopping.filter(it => it.id !== id);
           saveState();
           renderShopping();
-        } else if (e.target.matches('.move-up-btn') || e.target.closest('.move-up-btn')) {
-          const idx = state.shopping.indexOf(item);
-          if (idx > 0) {
-            const tmp = state.shopping[idx - 1];
-            state.shopping[idx - 1] = item;
-            state.shopping[idx] = tmp;
-            saveState();
-            renderShopping();
+        }
+      });
+
+      // DRAG & DROP ORDINAMENTO
+      let draggedItem = null;
+
+      shoppingListEl.addEventListener('dragstart', (e) => {
+        const li = e.target.closest('.shopping-item');
+        if (!li) return;
+        draggedItem = li;
+        li.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      shoppingListEl.addEventListener('dragend', () => {
+        const li = shoppingListEl.querySelector('.dragging');
+        if (li) li.classList.remove('dragging');
+        draggedItem = null;
+        const ids = Array.from(shoppingListEl.querySelectorAll('.shopping-item')).map(el => el.dataset.id);
+        state.shopping.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
+        saveState();
+      });
+
+      function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.shopping-item:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+          if (offset < 0 && offset > closest.offset) {
+            return { offset, element: child };
+          } else {
+            return closest;
           }
-        } else if (e.target.matches('.move-down-btn') || e.target.closest('.move-down-btn')) {
-          const idx = state.shopping.indexOf(item);
-          if (idx < state.shopping.length - 1) {
-            const tmp = state.shopping[idx + 1];
-            state.shopping[idx + 1] = item;
-            state.shopping[idx] = tmp;
-            saveState();
-            renderShopping();
-          }
+        }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+      }
+
+      shoppingListEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(shoppingListEl, e.clientY);
+        const dragging = shoppingListEl.querySelector('.dragging');
+        if (!dragging) return;
+        if (afterElement == null) {
+          shoppingListEl.appendChild(dragging);
+        } else {
+          shoppingListEl.insertBefore(dragging, afterElement);
         }
       });
 
@@ -1190,6 +1235,11 @@
           const li = document.createElement('li');
           li.className = 'shopping-item' + (item.purchased ? ' purchased' : '') + (item.fromMenu ? ' menu' : '');
           li.dataset.id = item.id;
+          li.draggable = true;
+
+          const handle = document.createElement('div');
+          handle.className = 'drag-handle';
+          handle.textContent = '≡';
 
           const label = document.createElement('label');
 
@@ -1214,7 +1264,11 @@
           if (item.fromMenu) {
             const srcSpan = document.createElement('div');
             srcSpan.className = 'shopping-item-source';
-            srcSpan.textContent = 'dal menu';
+            let labelText = item.menuDishName || 'dal menu';
+            if (item.menuUsageCount && item.menuUsageCount > 1) {
+              labelText += ' ×' + item.menuUsageCount;
+            }
+            srcSpan.textContent = labelText;
             textWrap.appendChild(srcSpan);
           }
 
@@ -1224,25 +1278,14 @@
           const actions = document.createElement('div');
           actions.className = 'item-actions';
 
-          const upBtn = document.createElement('button');
-          upBtn.type = 'button';
-          upBtn.className = 'tiny-btn move-up-btn';
-          upBtn.innerHTML = '↑';
-
-          const downBtn = document.createElement('button');
-          downBtn.type = 'button';
-          downBtn.className = 'tiny-btn move-down-btn';
-          downBtn.innerHTML = '↓';
-
           const delBtn = document.createElement('button');
           delBtn.type = 'button';
           delBtn.className = 'tiny-btn del delete-item-btn';
           delBtn.innerHTML = '✕';
 
-          actions.appendChild(upBtn);
-          actions.appendChild(downBtn);
           actions.appendChild(delBtn);
 
+          li.appendChild(handle);
           li.appendChild(label);
           li.appendChild(actions);
 
@@ -1682,6 +1725,7 @@
 
       function updateMenuIngredients() {
         const counts = {};
+
         const addDishIngredients = (dishId) => {
           if (!dishId) return;
           const dish = state.dishes.primi.find(d => d.id === dishId)
@@ -1693,7 +1737,12 @@
             if (!name) return;
             const key = name.toLowerCase();
             if (!counts[key]) {
-              counts[key] = { count: 0, name, qty: ing.qty || '' };
+              counts[key] = {
+                count: 0,
+                name,
+                qty: ing.qty || '',
+                dishName: dish.name
+              };
             }
             counts[key].count += 1;
           });
@@ -1721,10 +1770,16 @@
               quantity: data.qty,
               purchased: false,
               fromMenu: true,
-              ingredientKey: key
+              ingredientKey: key,
+              menuDishName: data.dishName,
+              menuUsageCount: data.count
             });
           } else {
             existing.quantity = data.qty;
+            existing.menuDishName = data.dishName;
+            existing.menuUsageCount = data.count;
+            existing.fromMenu = true;
+            existing.ingredientKey = key;
           }
         });
       }
