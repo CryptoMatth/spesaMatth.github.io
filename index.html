@@ -621,16 +621,9 @@
           </p>
 
           <div style="margin-top:0.4rem; display:flex; gap:0.5rem; align-items:center;">
-            <input type="checkbox" id="edit-count-once">
-            <label for="edit-count-once" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
-              Conta gli ingredienti una sola volta anche se il piatto appare più volte
-            </label>
-          </div>
-
-          <div style="margin-top:0.3rem; display:flex; gap:0.5rem; align-items:center;">
-            <input type="checkbox" id="edit-max-two">
-            <label for="edit-max-two" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
-              Può comparire due volte in settimana
+            <input type="checkbox" id="edit-two-mode">
+            <label for="edit-two-mode" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+              Questo piatto può comparire due volte in settimana e gli ingredienti vengono contati una sola volta
             </label>
           </div>
 
@@ -720,16 +713,9 @@
                     <textarea id="primo-ingredients" placeholder="pasta; 200 g&#10;passata; 1 barattolo..."></textarea>
 
                     <div style="margin-top:0.4rem; display:flex; gap:0.5rem; align-items:center;">
-                      <input type="checkbox" id="primo-count-once">
-                      <label for="primo-count-once" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
-                        Conta gli ingredienti una sola volta anche se il piatto appare più volte
-                      </label>
-                    </div>
-
-                    <div style="margin-top:0.3rem; display:flex; gap:0.5rem; align-items:center;">
-                      <input type="checkbox" id="primo-max-two">
-                      <label for="primo-max-two" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
-                        Può comparire due volte in settimana
+                      <input type="checkbox" id="primo-two-mode">
+                      <label for="primo-two-mode" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+                        Questo piatto può comparire due volte in settimana e gli ingredienti vengono contati una sola volta
                       </label>
                     </div>
 
@@ -753,16 +739,9 @@
                     <textarea id="secondo-ingredients" placeholder="pollo; 300 g&#10;patate; 500 g..."></textarea>
 
                     <div style="margin-top:0.4rem; display:flex; gap:0.5rem; align-items:center;">
-                      <input type="checkbox" id="secondo-count-once">
-                      <label for="secondo-count-once" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
-                        Conta gli ingredienti una sola volta anche se il piatto appare più volte
-                      </label>
-                    </div>
-
-                    <div style="margin-top:0.3rem; display:flex; gap:0.5rem; align-items:center;">
-                      <input type="checkbox" id="secondo-max-two">
-                      <label for="secondo-max-two" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
-                        Può comparire due volte in settimana
+                      <input type="checkbox" id="secondo-two-mode">
+                      <label for="secondo-two-mode" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+                        Questo piatto può comparire due volte in settimana e gli ingredienti vengono contati una sola volta
                       </label>
                     </div>
 
@@ -779,7 +758,6 @@
             <div id="menu-piano" class="hidden">
               <h2>Piano settimanale</h2>
 
-              <!-- SOTTO-TAB PER LE SETTIMANE -->
               <div class="menu-subtabs" style="margin-top:0.5rem;">
                 <button type="button" class="menu-subtab-btn active" data-weektab="current">
                   Settimana corrente
@@ -789,7 +767,6 @@
                 </button>
               </div>
 
-              <!-- PANNELLO: SETTIMANA CORRENTE -->
               <div id="week-panel-current">
                 <h3>Settimana corrente</h3>
                 <table id="week-table-current"></table>
@@ -803,7 +780,6 @@
                 </div>
               </div>
 
-              <!-- PANNELLO: SETTIMANA PRECEDENTE -->
               <div id="week-panel-prev" class="hidden" style="margin-top:0.75rem;">
                 <h3>Settimana precedente (solo riferimento)</h3>
                 <table id="week-table-prev"></table>
@@ -936,8 +912,7 @@
       const editNameInput = document.getElementById('edit-dish-name');
       const editIngredientsInput = document.getElementById('edit-dish-ingredients');
       const editCancelBtn = document.getElementById('edit-dish-cancel');
-      const editCountOnceInput = document.getElementById('edit-count-once');
-      const editMaxTwoInput = document.getElementById('edit-max-two');
+      const editTwoModeInput = document.getElementById('edit-two-mode');
 
       let editingDishId = null;
       let editingDishType = null;
@@ -1047,7 +1022,6 @@
         });
       });
 
-      // week subtabs (current / prev)
       const weekTabButtons = document.querySelectorAll('[data-weektab]');
       const weekPanelCurrent = document.getElementById('week-panel-current');
       const weekPanelPrev = document.getElementById('week-panel-prev');
@@ -1249,10 +1223,8 @@
       const primoIngredientsInput = document.getElementById('primo-ingredients');
       const secondoNameInput = document.getElementById('secondo-name');
       const secondoIngredientsInput = document.getElementById('secondo-ingredients');
-      const primoCountOnceInput = document.getElementById('primo-count-once');
-      const secondoCountOnceInput = document.getElementById('secondo-count-once');
-      const primoMaxTwoInput = document.getElementById('primo-max-two');
-      const secondoMaxTwoInput = document.getElementById('secondo-max-two');
+      const primoTwoModeInput = document.getElementById('primo-two-mode');
+      const secondoTwoModeInput = document.getElementById('secondo-two-mode');
 
       function parseIngredientLine(line) {
         const parts = line.split(';');
@@ -1295,17 +1267,19 @@
           const parsed = parseIngredientLine(line);
           if (parsed) ingredients.push(parsed);
         });
+
+        const twoMode = !!primoTwoModeInput.checked;
         state.dishes.primi.push({
           id: uid(),
           name,
           ingredients,
-          countOnce: !!primoCountOnceInput.checked,
-          maxPerWeek: primoMaxTwoInput.checked ? 2 : 1
+          countOnce: twoMode,
+          maxPerWeek: twoMode ? 2 : 1
         });
+
         primoNameInput.value = '';
         primoIngredientsInput.value = '';
-        primoCountOnceInput.checked = false;
-        primoMaxTwoInput.checked = false;
+        primoTwoModeInput.checked = false;
         saveState();
         renderDishes();
         renderWeekSelectorsCurrent();
@@ -1326,17 +1300,19 @@
           const parsed = parseIngredientLine(line);
           if (parsed) ingredients.push(parsed);
         });
+
+        const twoMode = !!secondoTwoModeInput.checked;
         state.dishes.secondi.push({
           id: uid(),
           name,
           ingredients,
-          countOnce: !!secondoCountOnceInput.checked,
-          maxPerWeek: secondoMaxTwoInput.checked ? 2 : 1
+          countOnce: twoMode,
+          maxPerWeek: twoMode ? 2 : 1
         });
+
         secondoNameInput.value = '';
         secondoIngredientsInput.value = '';
-        secondoCountOnceInput.checked = false;
-        secondoMaxTwoInput.checked = false;
+        secondoTwoModeInput.checked = false;
         saveState();
         renderDishes();
         renderWeekSelectorsCurrent();
@@ -1410,8 +1386,13 @@
             const metaSpan = document.createElement('div');
             metaSpan.className = 'dish-item-meta';
             const parts = [`${dish.ingredients.length} ingredienti`];
-            if (dish.countOnce) parts.push('ingredienti una sola volta');
-            if (dish.maxPerWeek > 1) parts.push('max 2×/sett');
+            if (dish.maxPerWeek > 1 && dish.countOnce) {
+              parts.push('2×/sett (ingredienti una volta)');
+            } else if (dish.maxPerWeek > 1) {
+              parts.push('max 2×/sett');
+            } else if (dish.countOnce) {
+              parts.push('ingredienti una volta');
+            }
             metaSpan.textContent = parts.join(' · ');
 
             body.appendChild(nameSpan);
@@ -1471,8 +1452,13 @@
             const metaSpan = document.createElement('div');
             metaSpan.className = 'dish-item-meta';
             const parts = [`${dish.ingredients.length} ingredienti`];
-            if (dish.countOnce) parts.push('ingredienti una sola volta');
-            if (dish.maxPerWeek > 1) parts.push('max 2×/sett');
+            if (dish.maxPerWeek > 1 && dish.countOnce) {
+              parts.push('2×/sett (ingredienti una volta)');
+            } else if (dish.maxPerWeek > 1) {
+              parts.push('max 2×/sett');
+            } else if (dish.countOnce) {
+              parts.push('ingredienti una volta');
+            }
             metaSpan.textContent = parts.join(' · ');
 
             body.appendChild(nameSpan);
@@ -1527,8 +1513,8 @@
         editNameInput.value = dish.name;
         ensureIngredientObjects(dish);
         editIngredientsInput.value = dish.ingredients.map(serializeIngredient).join('\n');
-        editCountOnceInput.checked = !!dish.countOnce;
-        editMaxTwoInput.checked = (dish.maxPerWeek || 1) > 1;
+        const twoMode = !!(dish.countOnce || (dish.maxPerWeek && dish.maxPerWeek > 1));
+        editTwoModeInput.checked = twoMode;
         editModal.style.display = 'flex';
         editNameInput.focus();
       }
@@ -1576,10 +1562,11 @@
           closeEditModal();
           return;
         }
+        const twoMode = !!editTwoModeInput.checked;
         dish.name = name;
         dish.ingredients = ingredients;
-        dish.countOnce = !!editCountOnceInput.checked;
-        dish.maxPerWeek = editMaxTwoInput.checked ? 2 : 1;
+        dish.countOnce = twoMode;
+        dish.maxPerWeek = twoMode ? 2 : 1;
 
         saveState();
         renderDishes();
