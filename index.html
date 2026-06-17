@@ -2,1584 +2,1128 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#2B5540">
-  <title>Casa App</title>
+  <title>Spesa & Menu settimanale</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
-    /* =====================================================
-       VARIABILI E RESET
-    ===================================================== */
     :root {
-      --primary:        #2B5540;
-      --primary-light:  #3D7A5A;
-      --primary-dark:   #1D3D2E;
-      --accent:         #C55D2B;
-      --accent-bg:      #FEF0E8;
-      --accent-border:  #C55D2B;
-      --success:        #34C759;
-      --danger:         #FF3B30;
-      --warning-bg:     #FFF9E6;
-      --warning-text:   #B45309;
-
-      --bg:       #F7F6F2;
-      --surface:  #FFFFFF;
-      --surface2: #FAF9F7;
-      --border:   #E8E5DF;
-      --border2:  #D1CEC6;
-
-      --text:  #1C1C1E;
-      --text2: #636366;
-      --text3: #AEAEB2;
-
-      --radius:    14px;
-      --radius-sm: 10px;
-      --radius-xs: 7px;
-      --trans:     0.18s ease;
-
-      --tab-h:    60px;
-      --header-h: 54px;
+      --bg: #f5f5f5;
+      --bg-card: #ffffff;
+      --bg-accent: #e0f3ff;
+      --border: #d0d0d0;
+      --text: #222222;
+      --text-muted: #666666;
+      --primary: #0077b6;
+      --primary-dark: #005682;
+      --danger: #c92a2a;
+      --radius: 0.5rem;
+      --space: 0.75rem;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg:          #111110;
-        --surface:     #1C1C1A;
-        --surface2:    #242422;
-        --border:      #3A3A37;
-        --border2:     #4A4A46;
-        --text:        #F5F5F3;
-        --text2:       #8E8E8B;
-        --text3:       #5A5A57;
-        --accent-bg:   #2E1A0F;
-        --warning-bg:  #1E1800;
-        --warning-text:#D97706;
-      }
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    * { box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: var(--bg);
       color: var(--text);
-      max-width: 520px;
-      margin: 0 auto;
-      min-height: 100dvh;
-      -webkit-tap-highlight-color: transparent;
-      overflow-x: hidden;
-      font-size: 15px;
-    }
-
-    /* =====================================================
-       SCHERMATA PIN
-    ===================================================== */
-    #pin-screen {
-      position: fixed;
-      inset: 0;
-      max-width: 520px;
-      margin: 0 auto;
-      background: var(--primary);
+      min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
-      z-index: 200;
-      padding: 40px 24px 60px;
-      gap: 28px;
     }
 
-    .pin-logo { font-size: 56px; line-height: 1; }
-
-    .pin-title {
-      color: #fff;
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-    .pin-subtitle {
-      color: rgba(255,255,255,0.65);
-      font-size: 14px;
-      margin-top: -20px;
-      text-align: center;
-    }
-
-    .pin-dots {
-      display: flex;
-      gap: 18px;
-      margin: 4px 0;
-    }
-    .pin-dot {
-      width: 13px; height: 13px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.25);
-      transition: all 0.12s ease;
-    }
-    .pin-dot.filled  { background: #fff; transform: scale(1.15); }
-    .pin-dot.error   { background: #fca5a5; }
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      20%     { transform: translateX(-8px); }
-      60%     { transform: translateX(8px); }
-    }
-    .dots-shake .pin-dot { animation: shake 0.32s ease; }
-
-    .pin-keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 72px);
-      grid-template-rows: repeat(4, 68px);
-      gap: 12px;
-    }
-    .pin-btn {
-      width: 72px; height: 68px;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.12);
-      color: #fff;
-      font-size: 26px;
-      font-weight: 400;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.1s ease, transform 0.1s ease;
-      font-family: inherit;
-    }
-    .pin-btn:active { background: rgba(255,255,255,0.28); transform: scale(0.93); }
-    .pin-btn.ghost  { background: transparent; pointer-events: none; }
-    .pin-btn.del    { background: rgba(255,255,255,0.07); font-size: 20px; }
-
-    .pin-error {
-      color: #fca5a5;
-      font-size: 13px;
-      min-height: 18px;
-      text-align: center;
-    }
-
-    /* =====================================================
-       LAYOUT PRINCIPALE
-    ===================================================== */
-    #app {
-      display: flex;
-      flex-direction: column;
-      min-height: 100dvh;
-    }
-    #app.hidden { display: none; }
-
-    .app-header {
-      height: var(--header-h);
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 14px;
-      gap: 10px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    .header-title {
-      flex: 1;
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--primary);
-      letter-spacing: -0.3px;
-    }
-    .header-week-badge {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text2);
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 20px;
-      letter-spacing: 0.2px;
-    }
-    .icon-btn {
-      width: 34px; height: 34px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      color: var(--text2);
-      transition: background var(--trans);
-    }
-    .icon-btn:active { background: var(--border); }
-
-    .main-content {
-      flex: 1;
-      overflow-y: auto;
-      padding-bottom: calc(var(--tab-h) + 4px);
-    }
-
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    .tab-bar {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
+    #app-root {
       width: 100%;
-      max-width: 520px;
-      height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
-      background: var(--surface);
-      border-top: 1px solid var(--border);
+      max-width: 960px;
+      padding: 1rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    header {
       display: flex;
-      z-index: 10;
-    }
-    .tab-btn {
-      flex: 1;
-      border: none;
-      background: transparent;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      cursor: pointer;
-      color: var(--text3);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      transition: color var(--trans);
-      padding-bottom: env(safe-area-inset-bottom, 0);
-      font-family: inherit;
-    }
-    .tab-btn .ti { font-size: 22px; line-height: 1; }
-    .tab-btn.active { color: var(--primary); }
-
-    /* =====================================================
-       LISTA SPESA
-    ===================================================== */
-    .shop-top {
-      padding: 12px 14px 10px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .input-row { display: flex; gap: 8px; flex: 1; }
-
-    .field {
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      font-size: 15px;
-      background: var(--surface2);
-      color: var(--text);
-      outline: none;
-      transition: border-color var(--trans);
-      font-family: inherit;
-      flex: 1;
-      -webkit-appearance: none;
-    }
-    .field:focus { border-color: var(--primary); }
-    .field::placeholder { color: var(--text3); }
-    .field.qty { flex: 0 0 76px; }
-
-    .btn-add {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      width: 44px; height: 44px;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background var(--trans);
-      flex-shrink: 0;
-    }
-    .btn-add:active { background: var(--primary-dark); }
-
-    .shop-actions {
-      display: flex;
-      gap: 8px;
-      padding: 10px 14px 6px;
-    }
-
-    .btn-sm {
-      flex: 1;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      color: var(--text2);
-      font-family: inherit;
-      transition: all var(--trans);
-    }
-    .btn-sm:active { background: var(--border); }
-    .btn-sm.danger {
-      background: #FEF2F2;
-      border-color: #FCA5A5;
-      color: var(--danger);
-    }
-    .btn-sm.danger:active { background: #FEE2E2; }
-
-    .shop-list {
-      padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .shop-item {
-      background: var(--surface);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--primary);
-      padding: 11px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: opacity var(--trans);
-    }
-    .shop-item.from-menu {
-      border-left-color: var(--accent);
-      background: var(--accent-bg);
-      border-color: var(--accent-border);
-      border-left-width: 4px;
-    }
-    .shop-item.checked { opacity: 0.5; }
-    .shop-item.checked .item-name { text-decoration: line-through; }
-
-    .check-circle {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      border: 2px solid var(--border2);
-      background: transparent;
-      cursor: pointer;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s ease;
-      font-size: 13px;
-      color: transparent;
-    }
-    .check-circle.done {
-      background: var(--success);
-      border-color: var(--success);
-      color: #fff;
-    }
-
-    .item-body { flex: 1; min-width: 0; }
-    .item-name {
-      font-size: 15px;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .item-qty { font-size: 12px; color: var(--text2); margin-top: 1px; }
-    .item-source {
-      font-size: 11px;
-      color: var(--accent);
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .item-acts {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-    .tiny-btn {
-      width: 30px; height: 30px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      color: var(--text3);
-      transition: all var(--trans);
-    }
-    .tiny-btn:active { background: var(--border); }
-    .tiny-btn.del:active { background: #FEE2E2; color: var(--danger); }
-    .tiny-btn:disabled { opacity: 0.25; pointer-events: none; }
-
-    .empty-state {
-      text-align: center;
-      padding: 52px 24px;
-    }
-    .empty-icon { font-size: 52px; margin-bottom: 14px; }
-    .empty-title { font-size: 16px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
-    .empty-sub { font-size: 14px; color: var(--text3); }
-
-    /* =====================================================
-       TAB MENU
-    ===================================================== */
-    .sub-tabs {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      padding: 0 14px;
-    }
-    .sub-tab-btn {
-      padding: 13px 0;
-      border: none;
-      background: transparent;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text3);
-      cursor: pointer;
-      border-bottom: 2.5px solid transparent;
-      transition: all var(--trans);
-      font-family: inherit;
-      flex: 1;
-    }
-    .sub-tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    .sub-panel { display: none; }
-    .sub-panel.active { display: block; }
-
-    /* Sezione Piatti */
-    .sec-header {
-      padding: 14px 14px 8px;
-      display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
     }
-    .sec-title {
-      font-size: 17px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.3px;
-    }
-    .btn-green {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 9px 16px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background var(--trans);
-    }
-    .btn-green:active { background: var(--primary-dark); }
 
-    .filter-row {
-      display: flex;
-      gap: 8px;
-      padding: 0 14px 12px;
+    header h1 {
+      font-size: 1.4rem;
+      margin: 0;
     }
-    .pill {
-      padding: 6px 16px;
-      border-radius: 20px;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text2);
-      cursor: pointer;
-      font-family: inherit;
-      transition: all var(--trans);
-    }
-    .pill.active {
+
+    button {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 0.3rem 0.8rem;
       background: var(--primary);
+      color: #ffffff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    button:hover { background: var(--primary-dark); }
+    button.secondary {
+      background: transparent;
+      color: var(--primary);
       border-color: var(--primary);
-      color: #fff;
+    }
+    button.secondary:hover {
+      background: rgba(0,0,0,0.03);
+    }
+    button.danger {
+      background: var(--danger);
+      border-color: var(--danger);
     }
 
-    .dishes-grid {
-      padding: 0 14px;
+    .tabs {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-bottom: 20px;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
     }
-    .dish-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 13px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .type-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .dot-primo   { background: #3B82F6; }
-    .dot-secondo { background: var(--accent); }
-
-    .dish-info { flex: 1; min-width: 0; }
-    .dish-name {
-      font-size: 15px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .dish-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
-
-    .dish-acts { display: flex; gap: 4px; }
-
-    /* =====================================================
-       PIANO SETTIMANALE
-    ===================================================== */
-    .week-nav {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .arrow-btn {
-      width: 36px; height: 36px;
-      border: none;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
+    .tabs button {
+      flex: 1;
       justify-content: center;
-      font-size: 18px;
-      color: var(--text2);
-      transition: all var(--trans);
+      border-radius: 999px;
+      padding-block: 0.45rem;
+      background: transparent;
+      color: var(--text-muted);
+      border-color: var(--border);
     }
-    .arrow-btn:active { background: var(--border); }
-
-    .week-info { text-align: center; }
-    .week-title { font-size: 15px; font-weight: 800; color: var(--text); }
-    .week-dates { font-size: 12px; color: var(--text3); margin-top: 2px; }
-
-    .week-note {
-      margin: 12px 14px 0;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      border: 1px solid;
-    }
-    .week-note.current { background: #EFF8F2; border-color: #86EFAC; color: #166534; }
-    .week-note.past    { background: var(--surface2); border-color: var(--border); color: var(--text2); }
-    .week-note.future  { background: var(--warning-bg); border-color: #FDE68A; color: var(--warning-text); }
-
-    @media (prefers-color-scheme: dark) {
-      .week-note.current { background: #0F2B1A; border-color: #166534; color: #86EFAC; }
-      .week-note.future  { background: #1E1600; border-color: #92400E; color: #FDE68A; }
-    }
-
-    .week-days {
-      padding: 12px 14px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .day-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-    }
-    .day-head {
-      padding: 9px 14px;
+    .tabs button.active {
       background: var(--primary);
       color: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      border-color: var(--primary);
     }
-    .day-head.today { background: var(--primary-dark); }
-    .day-head.past  { background: var(--text3); }
-    .day-name-txt { font-size: 14px; font-weight: 700; }
-    .day-date-txt { font-size: 12px; opacity: 0.8; }
 
-    .day-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
-    .meal-row { display: flex; align-items: center; gap: 8px; }
-    .meal-lbl {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      width: 50px;
-      flex-shrink: 0;
+    .hidden { display: none !important; }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-top: 0;
+      margin-bottom: 0.6rem;
     }
-    .meal-sel {
+    h3 {
+      font-size: 1rem;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    label { display: block; font-size: 0.85rem; margin-bottom: 0.15rem; }
+
+    input[type="text"],
+    input[type="password"],
+    textarea,
+    select {
+      width: 100%;
+      border-radius: 0.4rem;
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.5rem;
+      font-size: 0.9rem;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 3.5rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .row > .col {
       flex: 1;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 8px 10px;
-      font-size: 13px;
-      background: var(--surface2);
-      color: var(--text);
-      outline: none;
-      font-family: inherit;
-      transition: border-color var(--trans);
-      -webkit-appearance: none;
+      min-width: min(100%, 260px);
+    }
+
+    .shopping-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    #shopping-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .shopping-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.4rem;
+      border-radius: 0.4rem;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+    .shopping-item.menu {
+      background: var(--bg-accent);
+      border-color: #9ad1ff;
+    }
+    .shopping-item label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0;
+      flex: 1;
       cursor: pointer;
     }
-    .meal-sel:focus { border-color: var(--primary); }
-    .meal-sel:disabled { opacity: 0.6; cursor: default; }
+    .shopping-item-name {
+      font-size: 0.9rem;
+    }
+    .shopping-item-qty {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .shopping-item.purchased .shopping-item-name,
+    .shopping-item.purchased .shopping-item-qty {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
 
-    /* =====================================================
-       MODALE PIATTO (bottom sheet)
-    ===================================================== */
-    .modal-bg {
+    .small-btn {
+      padding-inline: 0.45rem;
+      padding-block: 0.2rem;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      border-width: 1px;
+      background: transparent;
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+    .small-btn:hover {
+      background: rgba(0,0,0,0.04);
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    /* Dishes & week plan */
+    .dish-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-height: 220px;
+      overflow: auto;
+      border-radius: 0.4rem;
+      border: 1px solid var(--border);
+      padding: 0.35rem;
+      background: #fafafa;
+    }
+
+    .dish-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      padding: 0.2rem 0.35rem;
+      border-radius: 0.35rem;
+    }
+    .dish-item-name {
+      font-size: 0.88rem;
+    }
+    .dish-item-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.4rem;
+      vertical-align: top;
+    }
+    th {
+      background: #f0f0f0;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .slot-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    .slot {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Lock screen */
+    #lock-screen {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 50;
-      display: flex;
-      align-items: flex-end;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-    .modal-bg.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .modal-sheet {
-      width: 100%;
-      max-width: 520px;
-      margin: 0 auto;
-      background: var(--surface);
-      border-radius: var(--radius) var(--radius) 0 0;
-      max-height: 92dvh;
-      overflow-y: auto;
-      transform: translateY(100%);
-      transition: transform 0.24s ease;
-      padding-bottom: env(safe-area-inset-bottom, 16px);
-    }
-    .modal-bg.open .modal-sheet { transform: translateY(0); }
-
-    .modal-handle {
-      width: 36px; height: 4px;
-      background: var(--border2);
-      border-radius: 2px;
-      margin: 10px auto 0;
-    }
-    .modal-hdr {
-      padding: 14px 18px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .modal-ttl { font-size: 18px; font-weight: 800; color: var(--text); }
-    .modal-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 16px; }
-    .modal-ftr { padding: 0 18px 16px; display: flex; gap: 10px; }
-
-    .form-lbl {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--text2);
-      margin-bottom: 6px;
-    }
-
-    .type-toggle {
-      display: flex;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-    }
-    .type-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      background: transparent;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--trans);
-      font-family: inherit;
-      color: var(--text2);
-    }
-    .type-btn.active-primo   { background: #EFF6FF; color: #2563EB; }
-    .type-btn.active-secondo { background: #FEF0E8; color: var(--accent); }
-
-    .ing-list { display: flex; flex-direction: column; gap: 8px; }
-    .ing-row  { display: flex; gap: 8px; align-items: center; }
-    .ing-row .field { font-size: 14px; padding: 8px 10px; }
-
-    .btn-add-ing {
-      width: 100%;
-      background: transparent;
-      border: 1.5px dashed var(--border2);
-      color: var(--text2);
-      border-radius: var(--radius-sm);
-      padding: 10px;
-      font-size: 14px;
-      font-family: inherit;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all var(--trans);
-    }
-    .btn-add-ing:active { background: var(--border); }
-
-    .btn-cancel {
-      flex: 1;
       background: var(--bg);
-      border: 1.5px solid var(--border);
-      color: var(--text2);
-      border-radius: var(--radius-sm);
-      padding: 13px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all var(--trans);
-    }
-    .btn-cancel:active { background: var(--border); }
-
-    .btn-save {
-      flex: 1.5;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 13px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background var(--trans);
-    }
-    .btn-save:active { background: var(--primary-dark); }
-
-    /* =====================================================
-       TOAST
-    ===================================================== */
-    #toasts {
-      position: fixed;
-      bottom: calc(var(--tab-h) + 14px);
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 300;
       display: flex;
-      flex-direction: column-reverse;
-      gap: 8px;
-      width: min(calc(100% - 28px), 480px);
-      pointer-events: none;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      z-index: 10;
     }
-    .toast {
-      background: #1C1C1E;
-      color: #F5F5F3;
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
-      animation: tin 0.22s ease forwards;
-      pointer-events: all;
+    #lock-inner {
+      width: 100%;
+      max-width: 420px;
     }
-    @keyframes tin  { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes tout { from { opacity:1; transform:translateY(0); }   to { opacity:0; transform:translateY(12px); } }
-    .toast.out { animation: tout 0.22s ease forwards; }
+    .center {
+      text-align: center;
+    }
+    .error {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
 
-    /* =====================================================
-       UTILITÀ
-    ===================================================== */
-    .hidden { display: none !important; }
-    select option { background: var(--surface); color: var(--text); }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.2rem; }
+      .shopping-item-name { font-size: 0.86rem; }
+    }
   </style>
 </head>
 <body>
-
-<!-- ============================================================
-     SCHERMATA PIN
-============================================================ -->
-<div id="pin-screen">
-  <div class="pin-logo">🏠</div>
-  <div>
-    <div class="pin-title" id="pin-title">Casa App</div>
-    <div class="pin-subtitle" id="pin-sub">Inserisci il PIN</div>
-  </div>
-  <div class="pin-dots" id="pin-dots">
-    <div class="pin-dot" id="pd-0"></div>
-    <div class="pin-dot" id="pd-1"></div>
-    <div class="pin-dot" id="pd-2"></div>
-    <div class="pin-dot" id="pd-3"></div>
-  </div>
-  <div class="pin-error" id="pin-err"></div>
-  <div class="pin-keypad">
-    <button class="pin-btn" onclick="pinPress('1')">1</button>
-    <button class="pin-btn" onclick="pinPress('2')">2</button>
-    <button class="pin-btn" onclick="pinPress('3')">3</button>
-    <button class="pin-btn" onclick="pinPress('4')">4</button>
-    <button class="pin-btn" onclick="pinPress('5')">5</button>
-    <button class="pin-btn" onclick="pinPress('6')">6</button>
-    <button class="pin-btn" onclick="pinPress('7')">7</button>
-    <button class="pin-btn" onclick="pinPress('8')">8</button>
-    <button class="pin-btn" onclick="pinPress('9')">9</button>
-    <button class="pin-btn ghost"></button>
-    <button class="pin-btn" onclick="pinPress('0')">0</button>
-    <button class="pin-btn del" onclick="pinDel()">⌫</button>
-  </div>
-</div>
-
-<!-- ============================================================
-     APP PRINCIPALE
-============================================================ -->
-<div id="app" class="hidden">
-
-  <!-- Header -->
-  <div class="app-header">
-    <div class="header-title">🏠 Casa App</div>
-    <div class="header-week-badge" id="hdr-week"></div>
-    <button class="icon-btn" onclick="lockApp()" title="Blocca">🔒</button>
-  </div>
-
-  <div class="main-content">
-
-    <!-- ====================================================
-         TAB: LISTA SPESA
-    ==================================================== -->
-    <div class="tab-panel active" id="tab-shop">
-
-      <!-- Form aggiungi -->
-      <div class="shop-top">
-        <div class="input-row">
-          <input class="field" id="ni-name" type="text" placeholder="Prodotto…"
-                 onkeydown="if(event.key==='Enter')addItem()">
-          <input class="field qty" id="ni-qty" type="text" placeholder="Qt."
-                 onkeydown="if(event.key==='Enter')addItem()">
-        </div>
-        <button class="btn-add" onclick="addItem()">+</button>
-      </div>
-
-      <!-- Pulsanti azione -->
-      <div class="shop-actions">
-        <button class="btn-sm" onclick="removeChecked()">✅ Rimuovi acquistati</button>
-        <button class="btn-sm danger" onclick="clearAll()">🗑 Svuota tutto</button>
-      </div>
-
-      <!-- Lista -->
-      <div class="shop-list" id="shop-list"></div>
-
-    </div>
-
-    <!-- ====================================================
-         TAB: MENU
-    ==================================================== -->
-    <div class="tab-panel" id="tab-menu">
-
-      <!-- Sub-tabs -->
-      <div class="sub-tabs">
-        <button class="sub-tab-btn active" id="st-dishes-btn" onclick="switchSub('dishes')">🍝 Piatti</button>
-        <button class="sub-tab-btn" id="st-plan-btn" onclick="switchSub('plan')">📅 Piano Settimanale</button>
-      </div>
-
-      <!-- ---- Piatti ---- -->
-      <div class="sub-panel active" id="st-dishes">
-        <div class="sec-header">
-          <span class="sec-title">I miei piatti</span>
-          <button class="btn-green" onclick="openModal()">+ Nuovo piatto</button>
-        </div>
-        <div class="filter-row">
-          <button class="pill active" data-f="all"     onclick="setFilter(this,'all')">Tutti</button>
-          <button class="pill"        data-f="primo"   onclick="setFilter(this,'primo')">🔵 Primi</button>
-          <button class="pill"        data-f="secondo" onclick="setFilter(this,'secondo')">🟠 Secondi</button>
-        </div>
-        <div class="dishes-grid" id="dishes-list"></div>
-      </div>
-
-      <!-- ---- Piano Settimanale ---- -->
-      <div class="sub-panel" id="st-plan">
-        <div class="week-nav">
-          <button class="arrow-btn" onclick="shiftWeek(-1)">‹</button>
-          <div class="week-info">
-            <div class="week-title" id="wk-title"></div>
-            <div class="week-dates" id="wk-dates"></div>
+  <div id="app-root">
+    <!-- LOCK / PIN -->
+    <div id="lock-screen">
+      <div id="lock-inner" class="card">
+        <h1 class="center">Spesa & Menu</h1>
+        <div id="pin-setup">
+          <p>Imposta un codice di accesso (4–10 cifre) per proteggere l'app.</p>
+          <label for="new-pin">Nuovo codice</label>
+          <input type="password" id="new-pin" inputmode="numeric" autocomplete="off">
+          <div style="margin-top:0.6rem; display:flex; justify-content:flex-end;">
+            <button id="set-pin-btn">Salva codice</button>
           </div>
-          <button class="arrow-btn" onclick="shiftWeek(1)">›</button>
         </div>
-        <div class="week-note hidden" id="wk-note"></div>
-        <div class="week-days" id="week-days"></div>
-      </div>
 
+        <div id="pin-login" class="hidden">
+          <p>Inserisci il codice di accesso.</p>
+          <label for="pin-input">Codice</label>
+          <input type="password" id="pin-input" inputmode="numeric" autocomplete="off">
+          <div style="margin-top:0.6rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+            <span class="hint">Se sbagli più volte, puoi cancellare i dati dal browser.</span>
+            <button id="login-btn">Entra</button>
+          </div>
+          <p id="pin-error" class="error"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app" class="card hidden">
+      <header>
+        <h1>Spesa & Menu</h1>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
+          <button id="export-btn" class="secondary" title="Esporta dati in JSON">Esporta</button>
+          <button id="import-btn" class="secondary" title="Importa dati da JSON">Importa</button>
+          <button id="lock-btn" class="secondary" title="Blocca con codice">Blocca</button>
+          <input type="file" id="import-file-input" accept="application/json" style="display:none;">
+        </div>
+      </header>
+
+      <nav class="tabs">
+        <button type="button" class="tab-btn active" data-tab="shopping">Lista spesa</button>
+        <button type="button" class="tab-btn" data-tab="menu">Menu settimanale</button>
+      </nav>
+
+      <main>
+        <!-- TAB SPESA -->
+        <section id="tab-shopping">
+          <h2>Lista della spesa</h2>
+          <form id="shopping-form">
+            <div class="row">
+              <div class="col">
+                <label for="item-name">Oggetto</label>
+                <input type="text" id="item-name" autocomplete="off" required>
+              </div>
+              <div class="col">
+                <label for="item-qty">Quantità (opzionale)</label>
+                <input type="text" id="item-qty" autocomplete="off" placeholder="es. 1 kg, 3 pz...">
+              </div>
+            </div>
+            <div style="margin-top:0.6rem; display:flex; justify-content:flex-end;">
+              <button type="submit">Aggiungi alla lista</button>
+            </div>
+          </form>
+
+          <div class="shopping-actions">
+            <button type="button" id="clear-purchased-btn" class="secondary">Elimina comprati</button>
+            <button type="button" id="clear-all-btn" class="danger">Svuota lista</button>
+          </div>
+
+          <ul id="shopping-list"></ul>
+          <p class="hint">
+            Gli ingredienti aggiunti automaticamente dal menu sono evidenziati in azzurro.
+          </p>
+        </section>
+
+        <!-- TAB MENU -->
+        <section id="tab-menu" class="hidden">
+          <h2>Menu settimanale</h2>
+
+          <div class="row">
+            <div class="col">
+              <h3>Primi (max 14)</h3>
+              <form id="add-primo-form">
+                <label for="primo-name">Nome piatto</label>
+                <input type="text" id="primo-name" required>
+
+                <label for="primo-ingredients">Ingredienti (uno per riga)</label>
+                <textarea id="primo-ingredients" placeholder="es. pasta, passata di pomodoro, olio..."></textarea>
+
+                <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
+                  <button type="submit" class="secondary">Aggiungi primo</button>
+                </div>
+              </form>
+
+              <ul id="primi-list" class="dish-list"></ul>
+            </div>
+
+            <div class="col">
+              <h3>Secondi (max 14)</h3>
+              <form id="add-secondo-form">
+                <label for="secondo-name">Nome piatto</label>
+                <input type="text" id="secondo-name" required>
+
+                <label for="secondo-ingredients">Ingredienti (uno per riga)</label>
+                <textarea id="secondo-ingredients" placeholder="es. carne, patate, insalata..."></textarea>
+
+                <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
+                  <button type="submit" class="secondary">Aggiungi secondo</button>
+                </div>
+              </form>
+
+              <ul id="secondi-list" class="dish-list"></ul>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:1rem;">
+            <h3>Piano settimanale</h3>
+            <table id="week-table"></table>
+            <div style="margin-top:0.5rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+              <p class="hint" style="margin:0;">
+                Nei menu a tendina vedi “(scorsa settimana)” se il piatto è stato mangiato la settimana precedente.
+              </p>
+              <button type="button" id="archive-week-btn" class="secondary">
+                Archivia settimana corrente
+              </button>
+            </div>
+          </div>
+
+          <p class="hint">
+            Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa.
+            Togliendo il piatto, gli ingredienti collegati vengono rimossi se non servono ad altri piatti.
+          </p>
+        </section>
+      </main>
     </div>
   </div>
 
-  <!-- Tab bar -->
-  <div class="tab-bar">
-    <button class="tab-btn active" id="tb-shop" onclick="switchTab('shop')">
-      <span class="ti">🛒</span><span>Lista Spesa</span>
-    </button>
-    <button class="tab-btn" id="tb-menu" onclick="switchTab('menu')">
-      <span class="ti">🍽️</span><span>Menu</span>
-    </button>
-  </div>
-
-</div>
-
-<!-- ============================================================
-     MODALE: AGGIUNGI / MODIFICA PIATTO
-============================================================ -->
-<div class="modal-bg" id="modal-bg" onclick="handleBgClick(event)">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-hdr">
-      <div class="modal-ttl" id="modal-ttl">Nuovo piatto</div>
-      <button class="icon-btn" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body">
-
-      <div>
-        <label class="form-lbl">Nome</label>
-        <input class="field" id="d-name" type="text" placeholder="es. Pasta al pomodoro"
-               style="width:100%">
-      </div>
-
-      <div>
-        <label class="form-lbl">Tipo</label>
-        <div class="type-toggle">
-          <button class="type-btn active-primo" id="t-primo"   onclick="setType('primo')">🔵 Primo</button>
-          <button class="type-btn"              id="t-secondo" onclick="setType('secondo')">🟠 Secondo</button>
-        </div>
-      </div>
-
-      <div>
-        <label class="form-lbl">Ingredienti</label>
-        <div class="ing-list" id="ing-list"></div>
-        <button class="btn-add-ing" onclick="addIngRow()" style="margin-top:8px">
-          + Aggiungi ingrediente
-        </button>
-      </div>
-
-    </div>
-    <div class="modal-ftr">
-      <button class="btn-cancel" onclick="closeModal()">Annulla</button>
-      <button class="btn-save"   onclick="saveDish()">Salva piatto</button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast container -->
-<div id="toasts"></div>
-
-<!-- ============================================================
-     JAVASCRIPT
-============================================================ -->
-<script>
-'use strict';
-
-/* ============================================================
-   COSTANTI
-============================================================ */
-const GIORNI   = ['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
-const GIORNI_K = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
-const MESI     = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-
-/* ============================================================
-   STATO
-============================================================ */
-const S = {
-  pin: { buf: '', step: 'enter', first: '' }, // step: 'enter'|'setup1'|'setup2'
-  tab: 'shop',
-  sub: 'dishes',
-  filter: 'all',
-  modal: { open: false, editId: null, type: 'primo' },
-  viewWeek: '',
-};
-
-/* ============================================================
-   STORAGE
-============================================================ */
-const load = (k, def) => { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : def; } catch { return def; } };
-const save = (k, v)   => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.error(e); } };
-
-const getList   = ()  => load('shop_v2', []);
-const saveList  = (l) => save('shop_v2', l);
-const getDishes = ()  => load('dishes_v2', []);
-const saveDishes= (d) => save('dishes_v2', d);
-const getPlans  = ()  => load('plans_v2', {});
-const savePlans = (p) => save('plans_v2', p);
-const getPin    = ()  => load('pin_v2', null);
-const savePin   = (p) => save('pin_v2', p);
-
-/* ============================================================
-   UTILITÀ DATA / SETTIMANA
-============================================================ */
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-
-function isoWeekKey(date = new Date()) {
-  const d = new Date(date); d.setHours(0,0,0,0);
-  const day = d.getDay() || 7;
-  d.setDate(d.getDate() + 4 - day);
-  const y1 = new Date(d.getFullYear(), 0, 1);
-  const wn = Math.ceil((((d - y1) / 86400000) + 1) / 7);
-  return `${d.getFullYear()}-W${String(wn).padStart(2,'0')}`;
-}
-
-function weekDates(key) {
-  const [yr, wPart] = key.split('-W');
-  const year = +yr, wn = +wPart;
-  const jan4 = new Date(year, 0, 4);
-  const dow   = jan4.getDay() || 7;
-  const mon1  = new Date(jan4); mon1.setDate(jan4.getDate() - dow + 1);
-  return Array.from({length:7}, (_,i) => {
-    const d = new Date(mon1); d.setDate(mon1.getDate() + (wn-1)*7 + i); return d;
-  });
-}
-
-function shiftKey(key, n) {
-  const dates = weekDates(key);
-  const mon = new Date(dates[0]); mon.setDate(mon.getDate() + n*7);
-  return isoWeekKey(mon);
-}
-
-function fmtDate(d) { return `${d.getDate()} ${MESI[d.getMonth()]}`; }
-
-function isToday(d) {
-  const t = new Date();
-  return d.getDate()===t.getDate() && d.getMonth()===t.getMonth() && d.getFullYear()===t.getFullYear();
-}
-
-/* ============================================================
-   PIN
-============================================================ */
-function initPin() {
-  const pin = getPin();
-  if (!pin) {
-    S.pin.step = 'setup1';
-    document.getElementById('pin-sub').textContent = 'Imposta un PIN a 4 cifre';
-  } else {
-    S.pin.step = 'enter';
-    document.getElementById('pin-sub').textContent = 'Inserisci il PIN per accedere';
-  }
-  S.pin.buf = ''; S.pin.first = '';
-  refreshDots();
-}
-
-function pinPress(d) {
-  if (S.pin.buf.length >= 4) return;
-  S.pin.buf += d;
-  refreshDots();
-  if (S.pin.buf.length === 4) setTimeout(pinDone, 120);
-}
-
-function pinDel() {
-  S.pin.buf = S.pin.buf.slice(0,-1);
-  refreshDots();
-  document.getElementById('pin-err').textContent = '';
-}
-
-function refreshDots() {
-  for (let i=0;i<4;i++) {
-    const el = document.getElementById(`pd-${i}`);
-    el.className = 'pin-dot' + (i < S.pin.buf.length ? ' filled' : '');
-  }
-}
-
-function pinDone() {
-  if (S.pin.step === 'enter') {
-    if (S.pin.buf === getPin()) { doUnlock(); }
-    else { pinError('PIN errato. Riprova.'); }
-
-  } else if (S.pin.step === 'setup1') {
-    S.pin.first = S.pin.buf;
-    S.pin.buf   = '';
-    S.pin.step  = 'setup2';
-    document.getElementById('pin-sub').textContent = 'Conferma il PIN';
-    refreshDots();
-
-  } else if (S.pin.step === 'setup2') {
-    if (S.pin.buf === S.pin.first) {
-      savePin(S.pin.buf);
-      doUnlock();
-    } else {
-      S.pin.step = 'setup1'; S.pin.first = '';
-      document.getElementById('pin-sub').textContent = 'Imposta un PIN a 4 cifre';
-      pinError('I PIN non coincidono. Riprova.');
-    }
-  }
-}
-
-function pinError(msg) {
-  document.getElementById('pin-err').textContent = msg;
-  S.pin.buf = ''; refreshDots();
-  const dots = document.getElementById('pin-dots');
-  dots.classList.add('dots-shake');
-  setTimeout(() => dots.classList.remove('dots-shake'), 400);
-}
-
-function doUnlock() {
-  S.pin.buf = '';
-  document.getElementById('pin-screen').style.display = 'none';
-  document.getElementById('app').classList.remove('hidden');
-  initApp();
-}
-
-function lockApp() {
-  S.pin.buf = ''; S.pin.first = '';
-  document.getElementById('pin-screen').style.display = '';
-  document.getElementById('app').classList.add('hidden');
-  document.getElementById('pin-err').textContent = '';
-  initPin();
-}
-
-/* ============================================================
-   INIT APP
-============================================================ */
-function initApp() {
-  S.viewWeek = isoWeekKey();
-  document.getElementById('hdr-week').textContent = `Sett. ${S.viewWeek.split('-W')[1]}`;
-  renderList();
-  renderDishes();
-  renderWeekPlan();
-}
-
-/* ============================================================
-   NAVIGAZIONE TAB
-============================================================ */
-function switchTab(t) {
-  S.tab = t;
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`tab-${t}`).classList.add('active');
-  document.getElementById(`tb-${t}`).classList.add('active');
-}
-
-function switchSub(s) {
-  S.sub = s;
-  document.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`st-${s}`).classList.add('active');
-  document.getElementById(`st-${s}-btn`).classList.add('active');
-  if (s === 'plan') renderWeekPlan();
-}
-
-/* ============================================================
-   LISTA SPESA
-============================================================ */
-function addItem() {
-  const nameEl = document.getElementById('ni-name');
-  const qtyEl  = document.getElementById('ni-qty');
-  const name   = nameEl.value.trim();
-  if (!name) { nameEl.focus(); return; }
-
-  const list = getList();
-  list.push({ id: uid(), name, qty: qtyEl.value.trim(), done: false, menu: false, dishId: null, dishName: '', slot: null });
-  saveList(list);
-  nameEl.value = ''; qtyEl.value = ''; nameEl.focus();
-  renderList();
-}
-
-function toggleItem(id) {
-  const list = getList();
-  const it = list.find(i => i.id === id);
-  if (it) it.done = !it.done;
-  saveList(list); renderList();
-}
-
-function delItem(id) {
-  saveList(getList().filter(i => i.id !== id));
-  renderList();
-}
-
-function moveItem(id, dir) {
-  const list = getList();
-  const idx  = list.findIndex(i => i.id === id);
-  if (idx < 0) return;
-  const ni = idx + dir;
-  if (ni < 0 || ni >= list.length) return;
-  [list[idx], list[ni]] = [list[ni], list[idx]];
-  saveList(list); renderList();
-}
-
-function removeChecked() {
-  const list = getList();
-  const rem  = list.filter(i => i.done).length;
-  saveList(list.filter(i => !i.done));
-  renderList();
-  if (rem > 0) toast(`${rem} element${rem>1?'i':'o'} rimoss${rem>1?'i':'o'}`);
-}
-
-function clearAll() {
-  if (!confirm('Svuotare tutta la lista della spesa?\n(Il piano settimanale rimane invariato.)')) return;
-  saveList([]);
-  renderList();
-  toast('Lista svuotata');
-}
-
-function renderList() {
-  const list = getList();
-  const el   = document.getElementById('shop-list');
-
-  if (!list.length) {
-    el.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🛒</div>
-        <div class="empty-title">Lista vuota</div>
-        <div class="empty-sub">Aggiungi prodotti con il campo qui sopra,<br>o seleziona piatti nel piano settimanale</div>
-      </div>`;
-    return;
-  }
-
-  el.innerHTML = list.map((it, idx) => `
-    <div class="shop-item ${it.menu?'from-menu':''} ${it.done?'checked':''}" id="si-${it.id}">
-      <div class="check-circle ${it.done?'done':''}" onclick="toggleItem('${it.id}')">${it.done?'✓':''}</div>
-      <div class="item-body">
-        <div class="item-name">${esc(it.name)}</div>
-        ${it.qty  ? `<div class="item-qty">${esc(it.qty)}</div>` : ''}
-        ${it.menu && it.dishName ? `<div class="item-source">🍽️ ${esc(it.dishName)}</div>` : ''}
-      </div>
-      <div class="item-acts">
-        <button class="tiny-btn" onclick="moveItem('${it.id}',-1)" ${idx===0?'disabled':''}>↑</button>
-        <button class="tiny-btn" onclick="moveItem('${it.id}',1)"  ${idx===list.length-1?'disabled':''}>↓</button>
-        <button class="tiny-btn del" onclick="delItem('${it.id}')">🗑</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-/* ============================================================
-   PIATTI
-============================================================ */
-function setFilter(btn, f) {
-  S.filter = f;
-  document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDishes();
-}
-
-function renderDishes() {
-  let dishes = getDishes();
-  if (S.filter !== 'all') dishes = dishes.filter(d => d.type === S.filter);
-
-  const el = document.getElementById('dishes-list');
-
-  if (!dishes.length) {
-    el.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">${S.filter==='secondo'?'🥩':'🍝'}</div>
-        <div class="empty-title">Nessun piatto</div>
-        <div class="empty-sub">Clicca "+ Nuovo piatto" per aggiungere</div>
-      </div>`;
-    return;
-  }
-
-  el.innerHTML = dishes.map(d => `
-    <div class="dish-card">
-      <div class="type-dot ${d.type==='primo'?'dot-primo':'dot-secondo'}"></div>
-      <div class="dish-info">
-        <div class="dish-name">${esc(d.name)}</div>
-        <div class="dish-meta">
-          ${d.type==='primo'?'Primo piatto':'Secondo piatto'}
-          · ${d.ings.length} ingredient${d.ings.length!==1?'i':'e'}
-        </div>
-      </div>
-      <div class="dish-acts">
-        <button class="tiny-btn" onclick="openModal('${d.id}')">✏️</button>
-        <button class="tiny-btn del" onclick="deleteDish('${d.id}')">🗑</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-/* ---- Modale piatto ---- */
-function openModal(id = null) {
-  S.modal.editId = id;
-  const isEdit   = !!id;
-
-  document.getElementById('modal-ttl').textContent = isEdit ? 'Modifica piatto' : 'Nuovo piatto';
-  document.getElementById('ing-list').innerHTML = '';
-
-  if (isEdit) {
-    const d = getDishes().find(x => x.id === id);
-    if (!d) return;
-    document.getElementById('d-name').value = d.name;
-    S.modal.type = d.type;
-    d.ings.forEach(i => addIngRow(i.name, i.qty));
-  } else {
-    document.getElementById('d-name').value = '';
-    S.modal.type = 'primo';
-    addIngRow();
-  }
-
-  refreshTypeBtns();
-  document.getElementById('modal-bg').classList.add('open');
-  setTimeout(() => document.getElementById('d-name').focus(), 280);
-}
-
-function closeModal() {
-  document.getElementById('modal-bg').classList.remove('open');
-}
-
-function handleBgClick(e) {
-  if (e.target === document.getElementById('modal-bg')) closeModal();
-}
-
-function setType(t) { S.modal.type = t; refreshTypeBtns(); }
-
-function refreshTypeBtns() {
-  document.getElementById('t-primo').className   = `type-btn ${S.modal.type==='primo'  ?'active-primo':''}`;
-  document.getElementById('t-secondo').className = `type-btn ${S.modal.type==='secondo'?'active-secondo':''}`;
-}
-
-function addIngRow(name='', qty='') {
-  const row = document.createElement('div');
-  row.className = 'ing-row';
-  row.innerHTML = `
-    <input class="field" type="text" placeholder="Ingrediente" value="${esc(name)}" style="flex:2">
-    <input class="field" type="text" placeholder="Qt."         value="${esc(qty)}"  style="flex:1">
-    <button class="tiny-btn del" onclick="this.parentElement.remove()" style="flex-shrink:0">✕</button>
-  `;
-  document.getElementById('ing-list').appendChild(row);
-}
-
-function saveDish() {
-  const name = document.getElementById('d-name').value.trim();
-  if (!name) { alert('Inserisci il nome del piatto.'); return; }
-
-  const ings = [...document.querySelectorAll('#ing-list .ing-row')].map(row => {
-    const inputs = row.querySelectorAll('input');
-    return { name: inputs[0].value.trim(), qty: inputs[1].value.trim() };
-  }).filter(i => i.name);
-
-  let dishes = getDishes();
-
-  if (S.modal.editId) {
-    const idx = dishes.findIndex(d => d.id === S.modal.editId);
-    if (idx >= 0) {
-      const old = dishes[idx];
-      dishes[idx] = { ...old, name, type: S.modal.type, ings };
-      // Aggiorna gli ingredienti nella lista spesa se questo piatto era già selezionato
-      syncDishInList(S.modal.editId, ings, name);
-    }
-  } else {
-    dishes.push({ id: uid(), name, type: S.modal.type, ings });
-  }
-
-  saveDishes(dishes);
-  closeModal();
-  renderDishes();
-  // Aggiorna anche i select del piano (i nomi potrebbero essere cambiati)
-  if (S.sub === 'plan') renderWeekPlan();
-  toast(S.modal.editId ? 'Piatto aggiornato' : 'Piatto aggiunto ✓');
-}
-
-function syncDishInList(dishId, newIngs, dishName) {
-  let list  = getList();
-  const slots = [...new Set(list.filter(i => i.dishId===dishId && i.menu).map(i => i.slot))];
-  if (!slots.length) return;
-  slots.forEach(slot => {
-    list = list.filter(i => !(i.dishId===dishId && i.slot===slot));
-    newIngs.forEach(ing => list.push({ id:uid(), name:ing.name, qty:ing.qty, done:false, menu:true, dishId, dishName, slot }));
-  });
-  saveList(list);
-  renderList();
-}
-
-function deleteDish(id) {
-  if (!confirm('Eliminare questo piatto? Verrà rimosso anche dal piano settimanale.')) return;
-
-  let dishes = getDishes();
-  dishes = dishes.filter(d => d.id !== id);
-  saveDishes(dishes);
-
-  // Rimuovi da tutti i piani
-  const plans = getPlans();
-  Object.keys(plans).forEach(wk => {
-    GIORNI_K.forEach(day => {
-      ['primo','secondo'].forEach(meal => {
-        if (plans[wk][day] && plans[wk][day][meal] === id) {
-          plans[wk][day][meal] = null;
-          removeMealFromList(id, `${wk}-${day}-${meal}`);
+  <script>
+    (function() {
+      const STORAGE_KEY = 'mr_spesa_menu_state_v1';
+      const PIN_KEY = 'mr_spesa_menu_pin_v1';
+
+      const DAYS = [
+        { key: 'lun', label: 'Lunedì' },
+        { key: 'mar', label: 'Martedì' },
+        { key: 'mer', label: 'Mercoledì' },
+        { key: 'gio', label: 'Giovedì' },
+        { key: 'ven', label: 'Venerdì' },
+        { key: 'sab', label: 'Sabato' },
+        { key: 'dom', label: 'Domenica' }
+      ];
+
+      function defaultWeekPlan() {
+        const plan = {};
+        DAYS.forEach(d => {
+          plan[d.key] = {
+            lunch: { primoId: null, secondoId: null },
+            dinner: { primoId: null, secondoId: null }
+          };
+        });
+        return plan;
+      }
+
+      let state = {
+        shopping: [],
+        dishes: { primi: [], secondi: [] },
+        weekPlan: defaultWeekPlan(),
+        prevWeekPlan: {}
+      };
+
+      function uid() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          state = Object.assign({}, state, parsed);
+
+          if (!state.weekPlan) state.weekPlan = defaultWeekPlan();
+          if (!state.prevWeekPlan) state.prevWeekPlan = {};
+          if (!state.dishes) state.dishes = { primi: [], secondi: [] };
+          if (!state.dishes.primi) state.dishes.primi = [];
+          if (!state.dishes.secondi) state.dishes.secondi = [];
+          if (!Array.isArray(state.shopping)) state.shopping = [];
+        } catch (e) {
+          console.error('Errore nel loadState', e);
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          console.error('Errore nel saveState', e);
+        }
+      }
+
+      // Download JSON helper
+      function downloadJSON(data, filename) {
+        const jsonString = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      // PIN handling
+      const lockScreen = document.getElementById('lock-screen');
+      const pinSetup = document.getElementById('pin-setup');
+      const pinLogin = document.getElementById('pin-login');
+      const newPinInput = document.getElementById('new-pin');
+      const setPinBtn = document.getElementById('set-pin-btn');
+      const pinInput = document.getElementById('pin-input');
+      const loginBtn = document.getElementById('login-btn');
+      const pinError = document.getElementById('pin-error');
+      const app = document.getElementById('app');
+      const lockBtn = document.getElementById('lock-btn');
+      const exportBtn = document.getElementById('export-btn');
+      const importBtn = document.getElementById('import-btn');
+      const importFileInput = document.getElementById('import-file-input');
+
+      function hashPin(pin) {
+        return btoa(pin); // semplice obfuscation, non crittografia forte
+      }
+
+      function initPinScreen() {
+        const storedPin = localStorage.getItem(PIN_KEY);
+        if (!storedPin) {
+          pinSetup.classList.remove('hidden');
+          pinLogin.classList.add('hidden');
+          newPinInput.value = '';
+          newPinInput.focus();
+        } else {
+          pinSetup.classList.add('hidden');
+          pinLogin.classList.remove('hidden');
+          pinInput.value = '';
+          pinError.textContent = '';
+          pinInput.focus();
+        }
+      }
+
+      setPinBtn.addEventListener('click', function() {
+        const pin = newPinInput.value.trim();
+        if (pin.length < 4 || pin.length > 10) {
+          alert('Il codice deve avere tra 4 e 10 cifre.');
+          return;
+        }
+        localStorage.setItem(PIN_KEY, hashPin(pin));
+        initPinScreen();
+      });
+
+      loginBtn.addEventListener('click', function() {
+        const stored = localStorage.getItem(PIN_KEY);
+        const entered = pinInput.value.trim();
+        if (!stored) {
+          pinError.textContent = 'Nessun codice impostato. Ricarica la pagina.';
+          return;
+        }
+        if (hashPin(entered) === stored) {
+          pinError.textContent = '';
+          unlockApp();
+        } else {
+          pinError.textContent = 'Codice errato.';
         }
       });
-    });
-  });
-  savePlans(plans);
 
-  renderDishes();
-  if (S.sub==='plan') renderWeekPlan();
-  renderList();
-  toast('Piatto eliminato');
-}
+      function unlockApp() {
+        loadState();
+        renderAll();
+        lockScreen.classList.add('hidden');
+        app.classList.remove('hidden');
+      }
 
-/* ============================================================
-   PIANO SETTIMANALE
-============================================================ */
-function shiftWeek(n) {
-  S.viewWeek = shiftKey(S.viewWeek, n);
-  renderWeekPlan();
-}
+      lockBtn.addEventListener('click', function() {
+        app.classList.add('hidden');
+        lockScreen.classList.remove('hidden');
+        initPinScreen();
+      });
 
-function renderWeekPlan() {
-  const wk      = S.viewWeek;
-  const nowWk   = isoWeekKey();
-  const prevWk  = shiftKey(wk, -1);
+      // Export / Import
+      exportBtn.addEventListener('click', function() {
+        const payload = {
+          state,
+          version: 1,
+          exportedAt: new Date().toISOString()
+        };
+        downloadJSON(payload, 'spesa-menu-backup.json');
+      });
 
-  const plans   = getPlans();
-  const wkPlan  = plans[wk]  || {};
-  const prevPlan= plans[prevWk] || {};
-  const dates   = weekDates(wk);
+      importBtn.addEventListener('click', function() {
+        importFileInput.value = '';
+        importFileInput.click();
+      });
 
-  // Piatti usati la settimana scorsa
-  const prevIds = new Set();
-  GIORNI_K.forEach(day => {
-    if (prevPlan[day]) {
-      if (prevPlan[day].primo)   prevIds.add(prevPlan[day].primo);
-      if (prevPlan[day].secondo) prevIds.add(prevPlan[day].secondo);
-    }
-  });
+      importFileInput.addEventListener('change', function(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
 
-  const wn = wk.split('-W')[1];
-  document.getElementById('wk-title').textContent = `Settimana ${wn}`;
-  document.getElementById('wk-dates').textContent =
-    `${fmtDate(dates[0])} – ${fmtDate(dates[6])} ${dates[0].getFullYear()}`;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          try {
+            const text = ev.target.result;
+            const parsed = JSON.parse(text);
 
-  const noteEl = document.getElementById('wk-note');
-  const isPast = wk < nowWk, isCurr = wk === nowWk, isFut = wk > nowWk;
-  noteEl.classList.remove('hidden','current','past','future');
-  if (isCurr) {
-    noteEl.className = 'week-note current';
-    noteEl.textContent = '📌 Settimana corrente — i piatti selezionati vengono aggiunti alla lista spesa';
-  } else if (isPast) {
-    noteEl.className = 'week-note past';
-    noteEl.textContent = '📚 Settimana passata — sola lettura';
-  } else {
-    noteEl.className = 'week-note future';
-    noteEl.textContent = '🔮 Settimana futura — pianificazione (non sincronizza la spesa)';
-  }
+            const newState = parsed.state || parsed;
 
-  const dishes = getDishes();
-  const primi   = dishes.filter(d => d.type==='primo');
-  const secondi = dishes.filter(d => d.type==='secondo');
-  const ro = !isCurr; // past & future: read-only per la spesa; past anche disabilitato
+            if (!newState || typeof newState !== 'object') {
+              alert('Il file JSON non contiene uno stato valido.');
+              return;
+            }
 
-  const container = document.getElementById('week-days');
-  container.innerHTML = '';
+            if (!confirm('Importare i dati dal file? Sovrascriverà lo stato attuale.')) {
+              return;
+            }
 
-  GIORNI.forEach((gName, idx) => {
-    const dayKey  = GIORNI_K[idx];
-    const dayPlan = wkPlan[dayKey] || { primo: null, secondo: null };
-    const date    = dates[idx];
-    const today   = isToday(date);
-    const headCls = today ? 'today' : isPast ? 'past' : '';
-    const disabled = isPast ? 'disabled' : '';
+            state = Object.assign({}, state, newState);
 
-    const card = document.createElement('div');
-    card.className = 'day-card';
-    card.innerHTML = `
-      <div class="day-head ${headCls}">
-        <span class="day-name-txt">${gName}${today ? ' 📍' : ''}</span>
-        <span class="day-date-txt">${fmtDate(date)}</span>
-      </div>
-      <div class="day-body">
-        <div class="meal-row">
-          <span class="meal-lbl">Primo</span>
-          <select class="meal-sel" ${disabled}
-                  onchange="onMealChange('${wk}','${dayKey}','primo',this.value)">
-            <option value="">— nessun piatto —</option>
-            ${buildOpts(primi, dayPlan.primo, prevIds)}
-          </select>
-        </div>
-        <div class="meal-row">
-          <span class="meal-lbl">Secondo</span>
-          <select class="meal-sel" ${disabled}
-                  onchange="onMealChange('${wk}','${dayKey}','secondo',this.value)">
-            <option value="">— nessun piatto —</option>
-            ${buildOpts(secondi, dayPlan.secondo, prevIds)}
-          </select>
-        </div>
-      </div>
-    `;
-    container.appendChild(card);
-  });
-}
+            if (!state.weekPlan) state.weekPlan = defaultWeekPlan();
+            if (!state.prevWeekPlan) state.prevWeekPlan = {};
+            if (!state.dishes) state.dishes = { primi: [], secondi: [] };
+            if (!state.dishes.primi) state.dishes.primi = [];
+            if (!state.dishes.secondi) state.dishes.secondi = [];
+            if (!Array.isArray(state.shopping)) state.shopping = [];
 
-function buildOpts(dishes, selId, prevIds) {
-  return dishes.map(d => {
-    const warn = prevIds.has(d.id) ? '⚠️ ' : '';
-    const note = prevIds.has(d.id) ? ' (sett. scorsa)' : '';
-    const sel  = selId === d.id ? 'selected' : '';
-    return `<option value="${d.id}" ${sel}>${esc(warn + d.name + note)}</option>`;
-  }).join('');
-}
+            saveState();
+            renderAll();
+            alert('Import completato con successo.');
+          } catch (err) {
+            console.error(err);
+            alert('Errore durante la lettura del file JSON.');
+          }
+        };
+        reader.readAsText(file, 'utf-8');
+      });
 
-function onMealChange(wk, dayKey, meal, dishId) {
-  const plans   = getPlans();
-  if (!plans[wk]) plans[wk] = {};
-  if (!plans[wk][dayKey]) plans[wk][dayKey] = { primo: null, secondo: null };
+      // TABS
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      const tabShopping = document.getElementById('tab-shopping');
+      const tabMenu = document.getElementById('tab-menu');
 
-  const oldId = plans[wk][dayKey][meal];
-  const slot  = `${wk}-${dayKey}-${meal}`;
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const tab = btn.dataset.tab;
+          tabShopping.classList.toggle('hidden', tab !== 'shopping');
+          tabMenu.classList.toggle('hidden', tab !== 'menu');
+        });
+      });
 
-  // Rimuovi vecchi ingredienti
-  if (oldId) removeMealFromList(oldId, slot);
+      // Shopping list
+      const shoppingForm = document.getElementById('shopping-form');
+      const itemNameInput = document.getElementById('item-name');
+      const itemQtyInput = document.getElementById('item-qty');
+      const shoppingListEl = document.getElementById('shopping-list');
+      const clearPurchasedBtn = document.getElementById('clear-purchased-btn');
+      const clearAllBtn = document.getElementById('clear-all-btn');
 
-  // Salva nuova selezione
-  plans[wk][dayKey][meal] = dishId || null;
-  savePlans(plans);
+      shoppingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = itemNameInput.value.trim();
+        if (!name) return;
+        const qty = itemQtyInput.value.trim();
+        state.shopping.push({
+          id: uid(),
+          name,
+          quantity: qty,
+          purchased: false,
+          fromMenu: false,
+          ingredientKey: null
+        });
+        itemNameInput.value = '';
+        itemQtyInput.value = '';
+        saveState();
+        renderShopping();
+        itemNameInput.focus();
+      });
 
-  // Aggiungi nuovi ingredienti (solo settimana corrente)
-  if (dishId && wk === isoWeekKey()) {
-    addMealToList(dishId, slot);
-  }
+      clearPurchasedBtn.addEventListener('click', function() {
+        if (!confirm('Eliminare tutti gli elementi già comprati?')) return;
+        state.shopping = state.shopping.filter(it => !it.purchased);
+        saveState();
+        renderShopping();
+      });
 
-  renderList();
-}
+      clearAllBtn.addEventListener('click', function() {
+        if (!confirm('Svuotare completamente la lista della spesa?')) return;
+        state.shopping = [];
+        saveState();
+        renderShopping();
+      });
 
-function addMealToList(dishId, slot) {
-  const dish = getDishes().find(d => d.id === dishId);
-  if (!dish) return;
-  const list = getList();
-  dish.ings.forEach(ing => list.push({
-    id: uid(), name: ing.name, qty: ing.qty,
-    done: false, menu: true, dishId, dishName: dish.name, slot
-  }));
-  saveList(list);
-}
+      shoppingListEl.addEventListener('click', function(e) {
+        const li = e.target.closest('.shopping-item');
+        if (!li) return;
+        const id = li.dataset.id;
+        const item = state.shopping.find(it => it.id === id);
+        if (!item) return;
 
-function removeMealFromList(dishId, slot) {
-  saveList(getList().filter(i => !(i.dishId===dishId && i.slot===slot)));
-}
+        if (e.target.matches('.purchase-checkbox')) {
+          item.purchased = e.target.checked;
+          saveState();
+          renderShopping();
+        } else if (e.target.matches('.delete-item-btn')) {
+          if (item.fromMenu) {
+            if (!confirm('Questo ingrediente è collegato al menu. Vuoi eliminarlo comunque?')) return;
+          }
+          state.shopping = state.shopping.filter(it => it.id !== id);
+          saveState();
+          renderShopping();
+        } else if (e.target.matches('.move-up-btn')) {
+          const idx = state.shopping.indexOf(item);
+          if (idx > 0) {
+            const tmp = state.shopping[idx - 1];
+            state.shopping[idx - 1] = item;
+            state.shopping[idx] = tmp;
+            saveState();
+            renderShopping();
+          }
+        } else if (e.target.matches('.move-down-btn')) {
+          const idx = state.shopping.indexOf(item);
+          if (idx < state.shopping.length - 1) {
+            const tmp = state.shopping[idx + 1];
+            state.shopping[idx + 1] = item;
+            state.shopping[idx] = tmp;
+            saveState();
+            renderShopping();
+          }
+        }
+      });
 
-/* ============================================================
-   TOAST
-============================================================ */
-function toast(msg, ms=2400) {
-  const c = document.getElementById('toasts');
-  const el = document.createElement('div');
-  el.className = 'toast'; el.textContent = msg;
-  c.appendChild(el);
-  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 240); }, ms);
-}
+      function renderShopping() {
+        shoppingListEl.innerHTML = '';
+        if (state.shopping.length === 0) {
+          const li = document.createElement('li');
+          li.className = 'hint';
+          li.textContent = 'La lista è vuota.';
+          shoppingListEl.appendChild(li);
+          return;
+        }
+        state.shopping.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'shopping-item' + (item.purchased ? ' purchased' : '') + (item.fromMenu ? ' menu' : '');
+          li.dataset.id = item.id;
 
-/* ============================================================
-   ESCAPE HTML
-============================================================ */
-function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+          const label = document.createElement('label');
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.className = 'purchase-checkbox';
+          checkbox.checked = !!item.purchased;
 
-/* ============================================================
-   AVVIO
-============================================================ */
-document.addEventListener('DOMContentLoaded', initPin);
-</script>
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'shopping-item-name';
+          nameSpan.textContent = item.name;
+
+          const qtySpan = document.createElement('span');
+          qtySpan.className = 'shopping-item-qty';
+          if (item.quantity) qtySpan.textContent = '· ' + item.quantity;
+
+          label.appendChild(checkbox);
+          label.appendChild(nameSpan);
+          if (item.quantity) label.appendChild(qtySpan);
+
+          const upBtn = document.createElement('button');
+          upBtn.type = 'button';
+          upBtn.className = 'small-btn move-up-btn';
+          upBtn.textContent = '↑';
+
+          const downBtn = document.createElement('button');
+          downBtn.type = 'button';
+          downBtn.className = 'small-btn move-down-btn';
+          downBtn.textContent = '↓';
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'small-btn delete-item-btn';
+          delBtn.textContent = '✕';
+
+          li.appendChild(label);
+          li.appendChild(upBtn);
+          li.appendChild(downBtn);
+          li.appendChild(delBtn);
+
+          shoppingListEl.appendChild(li);
+        });
+      }
+
+      // Dishes
+      const primiListEl = document.getElementById('primi-list');
+      const secondiListEl = document.getElementById('secondi-list');
+      const addPrimoForm = document.getElementById('add-primo-form');
+      const addSecondoForm = document.getElementById('add-secondo-form');
+      const primoNameInput = document.getElementById('primo-name');
+      const primoIngredientsInput = document.getElementById('primo-ingredients');
+      const secondoNameInput = document.getElementById('secondo-name');
+      const secondoIngredientsInput = document.getElementById('secondo-ingredients');
+
+      addPrimoForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (state.dishes.primi.length >= 14) {
+          alert('Hai già inserito 14 primi.');
+          return;
+        }
+        const name = primoNameInput.value.trim();
+        if (!name) return;
+        const ingredients = primoIngredientsInput.value
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean);
+        state.dishes.primi.push({
+          id: uid(),
+          name,
+          ingredients
+        });
+        primoNameInput.value = '';
+        primoIngredientsInput.value = '';
+        saveState();
+        renderDishes();
+        renderWeekSelectors();
+        updateMenuIngredients();
+      });
+
+      addSecondoForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (state.dishes.secondi.length >= 14) {
+          alert('Hai già inserito 14 secondi.');
+          return;
+        }
+        const name = secondoNameInput.value.trim();
+        if (!name) return;
+        const ingredients = secondoIngredientsInput.value
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean);
+        state.dishes.secondi.push({
+          id: uid(),
+          name,
+          ingredients
+        });
+        secondoNameInput.value = '';
+        secondoIngredientsInput.value = '';
+        saveState();
+        renderDishes();
+        renderWeekSelectors();
+        updateMenuIngredients();
+      });
+
+      primiListEl.addEventListener('click', function(e) {
+        if (!e.target.matches('.delete-dish-btn')) return;
+        const id = e.target.dataset.id;
+        state.dishes.primi = state.dishes.primi.filter(d => d.id !== id);
+        removeDishFromWeek(id);
+        saveState();
+        renderDishes();
+        renderWeekSelectors();
+        updateMenuIngredients();
+      });
+
+      secondiListEl.addEventListener('click', function(e) {
+        if (!e.target.matches('.delete-dish-btn')) return;
+        const id = e.target.dataset.id;
+        state.dishes.secondi = state.dishes.secondi.filter(d => d.id !== id);
+        removeDishFromWeek(id);
+        saveState();
+        renderDishes();
+        renderWeekSelectors();
+        updateMenuIngredients();
+      });
+
+      function renderDishes() {
+        primiListEl.innerHTML = '';
+        if (state.dishes.primi.length === 0) {
+          const li = document.createElement('li');
+          li.className = 'hint';
+          li.textContent = 'Nessun primo inserito.';
+          primiListEl.appendChild(li);
+        } else {
+          state.dishes.primi.forEach(dish => {
+            const li = document.createElement('li');
+            li.className = 'dish-item';
+            const left = document.createElement('div');
+            const nameSpan = document.createElement('div');
+            nameSpan.className = 'dish-item-name';
+            nameSpan.textContent = dish.name;
+            const metaSpan = document.createElement('div');
+            metaSpan.className = 'dish-item-meta';
+            metaSpan.textContent = `${dish.ingredients.length} ingredienti`;
+            left.appendChild(nameSpan);
+            left.appendChild(metaSpan);
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'small-btn delete-dish-btn';
+            delBtn.dataset.id = dish.id;
+            delBtn.textContent = 'Elimina';
+
+            li.appendChild(left);
+            li.appendChild(delBtn);
+            primiListEl.appendChild(li);
+          });
+        }
+
+        secondiListEl.innerHTML = '';
+        if (state.dishes.secondi.length === 0) {
+          const li = document.createElement('li');
+          li.className = 'hint';
+          li.textContent = 'Nessun secondo inserito.';
+          secondiListEl.appendChild(li);
+        } else {
+          state.dishes.secondi.forEach(dish => {
+            const li = document.createElement('li');
+            li.className = 'dish-item';
+            const left = document.createElement('div');
+            const nameSpan = document.createElement('div');
+            nameSpan.className = 'dish-item-name';
+            nameSpan.textContent = dish.name;
+            const metaSpan = document.createElement('div');
+            metaSpan.className = 'dish-item-meta';
+            metaSpan.textContent = `${dish.ingredients.length} ingredienti`;
+            left.appendChild(nameSpan);
+            left.appendChild(metaSpan);
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'small-btn delete-dish-btn';
+            delBtn.dataset.id = dish.id;
+            delBtn.textContent = 'Elimina';
+
+            li.appendChild(left);
+            li.appendChild(delBtn);
+            secondiListEl.appendChild(li);
+          });
+        }
+      }
+
+      function removeDishFromWeek(dishId) {
+        Object.keys(state.weekPlan).forEach(dayKey => {
+          const day = state.weekPlan[dayKey];
+          ['lunch','dinner'].forEach(meal => {
+            if (day[meal].primoId === dishId) day[meal].primoId = null;
+            if (day[meal].secondoId === dishId) day[meal].secondoId = null;
+          });
+        });
+      }
+
+      // Week table
+      const weekTable = document.getElementById('week-table');
+      const archiveWeekBtn = document.getElementById('archive-week-btn');
+
+      function buildWeekTableSkeleton() {
+        let html = '<thead><tr><th>Giorno</th><th>Pranzo</th><th>Cena</th></tr></thead><tbody>';
+        DAYS.forEach(d => {
+          html += `
+            <tr data-day="${d.key}">
+              <th>${d.label}</th>
+              <td>
+                <div class="slot">
+                  <div class="slot-title">Primo</div>
+                  <select class="dish-select" data-day="${d.key}" data-meal="lunch" data-course="primo"></select>
+                </div>
+                <div class="slot">
+                  <div class="slot-title">Secondo</div>
+                  <select class="dish-select" data-day="${d.key}" data-meal="lunch" data-course="secondo"></select>
+                </div>
+              </td>
+              <td>
+                <div class="slot">
+                  <div class="slot-title">Primo</div>
+                  <select class="dish-select" data-day="${d.key}" data-meal="dinner" data-course="primo"></select>
+                </div>
+                <div class="slot">
+                  <div class="slot-title">Secondo</div>
+                  <select class="dish-select" data-day="${d.key}" data-meal="dinner" data-course="secondo"></select>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+        html += '</tbody>';
+        weekTable.innerHTML = html;
+      }
+
+      function getPrevWeekDishIdsSet() {
+        const set = new Set();
+        const prev = state.prevWeekPlan || {};
+        Object.keys(prev).forEach(dayKey => {
+          const day = prev[dayKey];
+          if (!day) return;
+          ['lunch','dinner'].forEach(meal => {
+            if (!day[meal]) return;
+            if (day[meal].primoId) set.add(day[meal].primoId);
+            if (day[meal].secondoId) set.add(day[meal].secondoId);
+          });
+        });
+        return set;
+      }
+
+      function renderWeekSelectors() {
+        const prevSet = getPrevWeekDishIdsSet();
+        const selects = weekTable.querySelectorAll('.dish-select');
+        selects.forEach(sel => {
+          const course = sel.dataset.course;
+          const dayKey = sel.dataset.day;
+          const meal = sel.dataset.meal;
+          const day = state.weekPlan[dayKey];
+          if (!day) return;
+          const currentId = (course === 'primo')
+            ? day[meal].primoId
+            : day[meal].secondoId;
+
+          const dishes = course === 'primo'
+            ? state.dishes.primi
+            : state.dishes.secondi;
+
+          let optionsHtml = '<option value="">(nessuno)</option>';
+          dishes.forEach(d => {
+            let label = d.name;
+            if (prevSet.has(d.id)) label += ' (scorsa settimana)';
+            optionsHtml += `<option value="${d.id}">${label}</option>`;
+          });
+          sel.innerHTML = optionsHtml;
+          if (currentId) sel.value = currentId;
+        });
+      }
+
+      weekTable.addEventListener('change', function(e) {
+        if (!e.target.matches('.dish-select')) return;
+        const sel = e.target;
+        const dayKey = sel.dataset.day;
+        const meal = sel.dataset.meal;
+        const course = sel.dataset.course;
+        const value = sel.value || null;
+
+        const day = state.weekPlan[dayKey];
+        if (!day) return;
+
+        if (course === 'primo') {
+          day[meal].primoId = value;
+        } else {
+          day[meal].secondoId = value;
+        }
+        updateMenuIngredients();
+        saveState();
+        renderShopping();
+        renderWeekSelectors();
+      });
+
+      archiveWeekBtn.addEventListener('click', function() {
+        if (!confirm('Archiviare la settimana corrente come "settimana precedente" e azzerare il piano?')) return;
+        state.prevWeekPlan = JSON.parse(JSON.stringify(state.weekPlan));
+        state.weekPlan = defaultWeekPlan();
+        updateMenuIngredients();
+        saveState();
+        renderWeekSelectors();
+      });
+
+      function updateMenuIngredients() {
+        const counts = {};
+        const addDishIngredients = (dishId) => {
+          if (!dishId) return;
+          const dish = state.dishes.primi.find(d => d.id === dishId)
+            || state.dishes.secondi.find(d => d.id === dishId);
+          if (!dish || !dish.ingredients) return;
+          dish.ingredients.forEach(rawIng => {
+            const trimmed = rawIng.trim();
+            if (!trimmed) return;
+            const key = trimmed.toLowerCase();
+            if (!counts[key]) {
+              counts[key] = { count: 0, display: trimmed };
+            }
+            counts[key].count += 1;
+          });
+        };
+
+        Object.keys(state.weekPlan).forEach(dayKey => {
+          const day = state.weekPlan[dayKey];
+          if (!day) return;
+          ['lunch','dinner'].forEach(meal => {
+            if (!day[meal]) return;
+            addDishIngredients(day[meal].primoId);
+            addDishIngredients(day[meal].secondoId);
+          });
+        });
+
+        state.shopping = state.shopping.filter(it => !it.fromMenu || counts[it.ingredientKey]);
+
+        Object.keys(counts).forEach(key => {
+          const existing = state.shopping.find(it => it.fromMenu && it.ingredientKey === key);
+          if (!existing) {
+            state.shopping.push({
+              id: uid(),
+              name: counts[key].display,
+              quantity: '',
+              purchased: false,
+              fromMenu: true,
+              ingredientKey: key
+            });
+          }
+        });
+      }
+
+      function renderAll() {
+        buildWeekTableSkeleton();
+        renderDishes();
+        renderWeekSelectors();
+        updateMenuIngredients();
+        saveState();
+        renderShopping();
+      }
+
+      // Init
+      initPinScreen();
+    })();
+  </script>
 </body>
 </html>
