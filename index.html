@@ -675,6 +675,13 @@
             </label>
           </div>
 
+          <div style="margin-top:0.3rem; display:flex; gap:0.5rem; align-items:center;">
+            <input type="checkbox" id="edit-max-two">
+            <label for="edit-max-two" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+              Può comparire due volte in settimana
+            </label>
+          </div>
+
           <div id="edit-dish-buttons">
             <button type="button" id="edit-dish-cancel" class="btn-secondary">Annulla</button>
             <button type="submit" class="btn-primary">Salva modifiche</button>
@@ -767,6 +774,13 @@
                       </label>
                     </div>
 
+                    <div style="margin-top:0.3rem; display:flex; gap:0.5rem; align-items:center;">
+                      <input type="checkbox" id="primo-max-two">
+                      <label for="primo-max-two" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+                        Può comparire due volte in settimana
+                      </label>
+                    </div>
+
                     <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
                       <button type="submit" class="btn-secondary">Aggiungi primo</button>
                     </div>
@@ -790,6 +804,13 @@
                       <input type="checkbox" id="secondo-count-once">
                       <label for="secondo-count-once" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
                         Conta gli ingredienti una sola volta anche se il piatto appare più volte
+                      </label>
+                    </div>
+
+                    <div style="margin-top:0.3rem; display:flex; gap:0.5rem; align-items:center;">
+                      <input type="checkbox" id="secondo-max-two">
+                      <label for="secondo-max-two" style="margin:0; text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2);">
+                        Può comparire due volte in settimana
                       </label>
                     </div>
 
@@ -911,9 +932,11 @@
 
           state.dishes.primi.forEach(d => {
             if (d.countOnce === undefined) d.countOnce = false;
+            if (!d.maxPerWeek) d.maxPerWeek = 1;
           });
           state.dishes.secondi.forEach(d => {
             if (d.countOnce === undefined) d.countOnce = false;
+            if (!d.maxPerWeek) d.maxPerWeek = 1;
           });
         } catch (e) {
           console.error('Errore nel loadState', e);
@@ -952,6 +975,7 @@
       const editIngredientsInput = document.getElementById('edit-dish-ingredients');
       const editCancelBtn = document.getElementById('edit-dish-cancel');
       const editCountOnceInput = document.getElementById('edit-count-once');
+      const editMaxTwoInput = document.getElementById('edit-max-two');
 
       let editingDishId = null;
       let editingDishType = null;
@@ -959,7 +983,7 @@
       exportBtn.addEventListener('click', function() {
         const payload = {
           state,
-          version: 3,
+          version: 4,
           exportedAt: new Date().toISOString()
         };
         downloadJSON(payload, 'spesa-menu-backup.json');
@@ -1000,9 +1024,11 @@
             if (!Array.isArray(state.historyWeeks)) state.historyWeeks = [];
             state.dishes.primi.forEach(d => {
               if (d.countOnce === undefined) d.countOnce = false;
+              if (!d.maxPerWeek) d.maxPerWeek = 1;
             });
             state.dishes.secondi.forEach(d => {
               if (d.countOnce === undefined) d.countOnce = false;
+              if (!d.maxPerWeek) d.maxPerWeek = 1;
             });
 
             saveState();
@@ -1233,6 +1259,8 @@
       const secondoIngredientsInput = document.getElementById('secondo-ingredients');
       const primoCountOnceInput = document.getElementById('primo-count-once');
       const secondoCountOnceInput = document.getElementById('secondo-count-once');
+      const primoMaxTwoInput = document.getElementById('primo-max-two');
+      const secondoMaxTwoInput = document.getElementById('secondo-max-two');
 
       function parseIngredientLine(line) {
         const parts = line.split(';');
@@ -1279,11 +1307,13 @@
           id: uid(),
           name,
           ingredients,
-          countOnce: !!primoCountOnceInput.checked
+          countOnce: !!primoCountOnceInput.checked,
+          maxPerWeek: primoMaxTwoInput.checked ? 2 : 1
         });
         primoNameInput.value = '';
         primoIngredientsInput.value = '';
         primoCountOnceInput.checked = false;
+        primoMaxTwoInput.checked = false;
         saveState();
         renderDishes();
         renderWeekSelectors();
@@ -1307,11 +1337,13 @@
           id: uid(),
           name,
           ingredients,
-          countOnce: !!secondoCountOnceInput.checked
+          countOnce: !!secondoCountOnceInput.checked,
+          maxPerWeek: secondoMaxTwoInput.checked ? 2 : 1
         });
         secondoNameInput.value = '';
         secondoIngredientsInput.value = '';
         secondoCountOnceInput.checked = false;
+        secondoMaxTwoInput.checked = false;
         saveState();
         renderDishes();
         renderWeekSelectors();
@@ -1365,6 +1397,7 @@
           state.dishes.primi.forEach(dish => {
             ensureIngredientObjects(dish);
             if (dish.countOnce === undefined) dish.countOnce = false;
+            if (!dish.maxPerWeek) dish.maxPerWeek = 1;
             const li = document.createElement('li');
             li.className = 'dish-item';
 
@@ -1380,7 +1413,10 @@
 
             const metaSpan = document.createElement('div');
             metaSpan.className = 'dish-item-meta';
-            metaSpan.textContent = `${dish.ingredients.length} ingredienti` + (dish.countOnce ? ' · conta una sola volta' : '');
+            const parts = [`${dish.ingredients.length} ingredienti`];
+            if (dish.countOnce) parts.push('ingredienti una sola volta');
+            if (dish.maxPerWeek > 1) parts.push('max 2×/sett');
+            metaSpan.textContent = parts.join(' · ');
 
             body.appendChild(nameSpan);
             body.appendChild(metaSpan);
@@ -1422,6 +1458,7 @@
           state.dishes.secondi.forEach(dish => {
             ensureIngredientObjects(dish);
             if (dish.countOnce === undefined) dish.countOnce = false;
+            if (!dish.maxPerWeek) dish.maxPerWeek = 1;
             const li = document.createElement('li');
             li.className = 'dish-item';
 
@@ -1437,7 +1474,10 @@
 
             const metaSpan = document.createElement('div');
             metaSpan.className = 'dish-item-meta';
-            metaSpan.textContent = `${dish.ingredients.length} ingredienti` + (dish.countOnce ? ' · conta una sola volta' : '');
+            const parts = [`${dish.ingredients.length} ingredienti`];
+            if (dish.countOnce) parts.push('ingredienti una sola volta');
+            if (dish.maxPerWeek > 1) parts.push('max 2×/sett');
+            metaSpan.textContent = parts.join(' · ');
 
             body.appendChild(nameSpan);
             body.appendChild(metaSpan);
@@ -1487,6 +1527,7 @@
         ensureIngredientObjects(dish);
         editIngredientsInput.value = dish.ingredients.map(serializeIngredient).join('\n');
         editCountOnceInput.checked = !!dish.countOnce;
+        editMaxTwoInput.checked = (dish.maxPerWeek || 1) > 1;
         editModal.style.display = 'flex';
         editNameInput.focus();
       }
@@ -1537,6 +1578,7 @@
         dish.name = name;
         dish.ingredients = ingredients;
         dish.countOnce = !!editCountOnceInput.checked;
+        dish.maxPerWeek = editMaxTwoInput.checked ? 2 : 1;
 
         saveState();
         renderDishes();
@@ -1604,6 +1646,20 @@
         return set;
       }
 
+      function getDishCurrentWeekCount(dishId) {
+        if (!dishId) return 0;
+        let c = 0;
+        Object.keys(state.weekPlan).forEach(dayKey => {
+          const day = state.weekPlan[dayKey];
+          if (!day) return;
+          ['lunch','dinner'].forEach(meal => {
+            if (!day[meal]) return;
+            if (day[meal].primoId === dishId || day[meal].secondoId === dishId) c++;
+          });
+        });
+        return c;
+      }
+
       function renderWeekSelectors() {
         const prevSet = getPrevWeekDishIdsSet();
         const selects = weekTable.querySelectorAll('.dish-select');
@@ -1621,14 +1677,39 @@
             ? state.dishes.primi
             : state.dishes.secondi;
 
-          let optionsHtml = '<option value="">(nessuno)</option>';
+          const normalOptions = [];
+          const mutedOptions = [];
+
           dishes.forEach(d => {
+            const countWeek = getDishCurrentWeekCount(d.id);
+            const maxWeek = d.maxPerWeek || 1;
+            const overCurrent = countWeek >= maxWeek;
+            const wasPrev = prevSet.has(d.id);
+
+            const tags = [];
+            if (countWeek > 0) tags.push('questa settimana');
+            if (wasPrev) tags.push('settimana scorsa');
+
             let label = d.name;
-            if (prevSet.has(d.id)) label += ' (scorsa settimana)';
-            optionsHtml += `<option value="${d.id}">${label}</option>`;
+            if (tags.length) label += ' (' + tags.join(', ') + ')';
+
+            const isMuted = overCurrent || wasPrev;
+            const optHtml = `<option value="${d.id}"${isMuted ? ' style="color:#A1A1AA;"' : ''}>${label}</option>`;
+
+            if (isMuted) mutedOptions.push(optHtml);
+            else normalOptions.push(optHtml);
           });
+
+          let optionsHtml = '<option value="">(nessuno)</option>';
+          optionsHtml += '<option value="__niente">Niente</option>';
+          optionsHtml += '<option value="__fuori">Fuori</option>';
+          optionsHtml += normalOptions.join('');
+          optionsHtml += mutedOptions.join('');
+
           sel.innerHTML = optionsHtml;
-          if (currentId) sel.value = currentId;
+          if (currentId !== null && currentId !== undefined) {
+            sel.value = currentId;
+          }
         });
       }
 
@@ -1696,7 +1777,7 @@
         }
         let html = '<thead><tr><th>Giorno</th><th>Pranzo</th><th>Cena</th></tr></thead><tbody>';
         const getDishName = (dishId) => {
-          if (!dishId) return '';
+          if (!dishId || dishId === '__niente' || dishId === '__fuori') return dishId === '__niente' ? 'Niente' : (dishId === '__fuori' ? 'Fuori' : '');
           const dish = state.dishes.primi.find(x => x.id === dishId)
             || state.dishes.secondi.find(x => x.id === dishId);
           return dish ? dish.name : '(eliminato)';
@@ -1770,7 +1851,7 @@
         const countedOnceDishes = new Set();
 
         const addDishIngredients = (dishId) => {
-          if (!dishId) return;
+          if (!dishId || dishId === '__niente' || dishId === '__fuori') return;
           const dish = state.dishes.primi.find(d => d.id === dishId)
             || state.dishes.secondi.find(d => d.id === dishId);
           if (!dish) return;
