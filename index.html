@@ -255,7 +255,6 @@
     }
 
     input[type="text"],
-    input[type="password"],
     textarea,
     select {
       width: 100%;
@@ -610,93 +609,6 @@
       padding: 6px 7px;
     }
 
-    #lock-screen {
-      position: fixed;
-      inset: 0;
-      max-width: 520px;
-      margin: 0 auto;
-      background: radial-gradient(circle at top, #1F2933 0, #020617 55%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 40px 24px;
-      z-index: 10;
-    }
-
-    #lock-inner {
-      width: 100%;
-      max-width: 420px;
-      background: rgba(0,0,0,0.14);
-      border-radius: 28px;
-      padding: 22px 20px 18px;
-      backdrop-filter: blur(24px);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
-      color: #fff;
-    }
-
-    #lock-inner h1 {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      text-align: center;
-      margin-bottom: 6px;
-    }
-
-    #lock-inner p {
-      font-size: 13px;
-      color: rgba(255,255,255,0.75);
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
-    #lock-inner label {
-      color: #f9fafb;
-      font-size: 12px;
-      text-align: left;
-    }
-
-    #lock-inner input[type="password"] {
-      background: rgba(0,0,0,0.22);
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #fff;
-    }
-
-    #lock-inner input[type="password"]::placeholder {
-      color: rgba(255,255,255,0.4);
-    }
-
-    #lock-inner button {
-      border-radius: 999px;
-      border: none;
-      background: #F9FAFB;
-      color: #1F2933;
-      padding: 7px 18px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transition: background 0.15s ease, transform 0.12s ease;
-    }
-
-    #lock-inner button:active {
-      background: #E5E7EB;
-      transform: scale(0.97);
-    }
-
-    .center { text-align: center; }
-
-    .error {
-      color: #FCA5A5;
-      font-size: 12px;
-      min-height: 18px;
-      text-align: center;
-      margin-top: 4px;
-    }
-
     #edit-dish-modal {
       position: fixed;
       inset: 0;
@@ -739,34 +651,6 @@
 </head>
 <body>
   <div id="app-root">
-    <!-- LOCK / PIN -->
-    <div id="lock-screen">
-      <div id="lock-inner">
-        <h1>Spesa & Menu</h1>
-        <div id="pin-setup">
-          <p>Imposta un codice di accesso (4–10 cifre) per proteggere l'app.</p>
-          <label for="new-pin">Nuovo codice</label>
-          <input type="password" id="new-pin" inputmode="numeric" autocomplete="off" placeholder="••••">
-          <div style="margin-top:0.9rem; display:flex; justify-content:flex-end;">
-            <button id="set-pin-btn">Salva codice</button>
-          </div>
-        </div>
-
-        <div id="pin-login" class="hidden">
-          <p>Inserisci il codice di accesso.</p>
-          <label for="pin-input">Codice</label>
-          <input type="password" id="pin-input" inputmode="numeric" autocomplete="off" placeholder="••••">
-          <div style="margin-top:0.9rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-            <span style="font-size:11px; color:rgba(255,255,255,0.65); text-align:left;">
-              Se sbagli più volte, puoi cancellare i dati dal browser.
-            </span>
-            <button id="login-btn">Entra</button>
-          </div>
-          <p id="pin-error" class="error"></p>
-        </div>
-      </div>
-    </div>
-
     <!-- MODAL MODIFICA PIATTO -->
     <div id="edit-dish-modal">
       <div id="edit-dish-inner">
@@ -793,7 +677,7 @@
     </div>
 
     <!-- APP -->
-    <div id="app" class="hidden">
+    <div id="app">
       <header>
         <h1>Spesa & Menu</h1>
         <div class="header-chips">
@@ -803,7 +687,6 @@
           </div>
           <button id="export-btn" class="icon-btn" title="Esporta dati (JSON)">⤓</button>
           <button id="import-btn" class="icon-btn" title="Importa dati (JSON)">⤒</button>
-          <button id="lock-btn" class="icon-btn" title="Blocca con codice">🔒</button>
           <input type="file" id="import-file-input" accept="application/json" style="display:none;">
         </div>
       </header>
@@ -954,7 +837,6 @@
   <script>
     (function() {
       const STORAGE_KEY = 'mr_spesa_menu_state_v1';
-      const PIN_KEY = 'mr_spesa_menu_pin_v1';
 
       const DAYS = [
         { key: 'lun', label: 'Lunedì' },
@@ -1036,16 +918,7 @@
         URL.revokeObjectURL(url);
       }
 
-      const lockScreen = document.getElementById('lock-screen');
-      const pinSetup = document.getElementById('pin-setup');
-      const pinLogin = document.getElementById('pin-login');
-      const newPinInput = document.getElementById('new-pin');
-      const setPinBtn = document.getElementById('set-pin-btn');
-      const pinInput = document.getElementById('pin-input');
-      const loginBtn = document.getElementById('login-btn');
-      const pinError = document.getElementById('pin-error');
       const app = document.getElementById('app');
-      const lockBtn = document.getElementById('lock-btn');
       const exportBtn = document.getElementById('export-btn');
       const importBtn = document.getElementById('import-btn');
       const importFileInput = document.getElementById('import-file-input');
@@ -1058,64 +931,6 @@
 
       let editingDishId = null;
       let editingDishType = null;
-
-      function hashPin(pin) {
-        return btoa(pin);
-      }
-
-      function initPinScreen() {
-        const storedPin = localStorage.getItem(PIN_KEY);
-        if (!storedPin) {
-          pinSetup.classList.remove('hidden');
-          pinLogin.classList.add('hidden');
-          newPinInput.value = '';
-          newPinInput.focus();
-        } else {
-          pinSetup.classList.add('hidden');
-          pinLogin.classList.remove('hidden');
-          pinInput.value = '';
-          pinError.textContent = '';
-          pinInput.focus();
-        }
-      }
-
-      setPinBtn.addEventListener('click', function() {
-        const pin = newPinInput.value.trim();
-        if (pin.length < 4 || pin.length > 10) {
-          alert('Il codice deve avere tra 4 e 10 cifre.');
-          return;
-        }
-        localStorage.setItem(PIN_KEY, hashPin(pin));
-        initPinScreen();
-      });
-
-      loginBtn.addEventListener('click', function() {
-        const stored = localStorage.getItem(PIN_KEY);
-        const entered = pinInput.value.trim();
-        if (!stored) {
-          pinError.textContent = 'Nessun codice impostato. Ricarica la pagina.';
-          return;
-        }
-        if (hashPin(entered) === stored) {
-          pinError.textContent = '';
-          unlockApp();
-        } else {
-          pinError.textContent = 'Codice errato.';
-        }
-      });
-
-      function unlockApp() {
-        loadState();
-        renderAll();
-        lockScreen.classList.add('hidden');
-        app.classList.remove('hidden');
-      }
-
-      lockBtn.addEventListener('click', function() {
-        app.classList.add('hidden');
-        lockScreen.classList.remove('hidden');
-        initPinScreen();
-      });
 
       exportBtn.addEventListener('click', function() {
         const payload = {
@@ -1989,7 +1804,9 @@
         renderShopping();
       }
 
-      initPinScreen();
+      loadState();
+      renderAll();
+      app.classList.remove('hidden');
     })();
   </script>
 </body>
