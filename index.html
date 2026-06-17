@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2B5540">
+  <title>Casa App</title>
+  <style>
+    /* =====================================================
+       VARIABILI E RESET
+    ===================================================== */
+    :root {
+      --primary:        #2B5540;
+      --primary-light:  #3D7A5A;
+      --primary-dark:   #1D3D2E;
+      --accent:         #C55D2B;
+      --accent-bg:      #FEF0E8;
+      --accent-border:  #C55D2B;
+      --success:        #34C759;
+      --danger:         #FF3B30;
+      --warning-bg:     #FFF9E6;
+      --warning-text:   #B45309;
+
+      --bg:       #F7F6F2;
+      --surface:  #FFFFFF;
+      --surface2: #FAF9F7;
+      --border:   #E8E5DF;
+      --border2:  #D1CEC6;
+
+      --text:  #1C1C1E;
+      --text2: #636366;
+      --text3: #AEAEB2;
+
+      --radius:    14px;
+      --radius-sm: 10px;
+      --radius-xs: 7px;
+      --trans:     0.18s ease;
+
+      --tab-h:    60px;
+      --header-h: 54px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:          #111110;
+        --surface:     #1C1C1A;
+        --surface2:    #242422;
+        --border:      #3A3A37;
+        --border2:     #4A4A46;
+        --text:        #F5F5F3;
+        --text2:       #8E8E8B;
+        --text3:       #5A5A57;
+        --accent-bg:   #2E1A0F;
+        --warning-bg:  #1E1800;
+        --warning-text:#D97706;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 520px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+      font-size: 15px;
+    }
+
+    /* =====================================================
+       SCHERMATA PIN
+    ===================================================== */
+    #pin-screen {
+      position: fixed;
+      inset: 0;
+      max-width: 520px;
+      margin: 0 auto;
+      background: var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 40px 24px 60px;
+      gap: 28px;
+    }
+
+    .pin-logo { font-size: 56px; line-height: 1; }
+
+    .pin-title {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .pin-subtitle {
+      color: rgba(255,255,255,0.65);
+      font-size: 14px;
+      margin-top: -20px;
+      text-align: center;
+    }
+
+    .pin-dots {
+      display: flex;
+      gap: 18px;
+      margin: 4px 0;
+    }
+    .pin-dot {
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transition: all 0.12s ease;
+    }
+    .pin-dot.filled  { background: #fff; transform: scale(1.15); }
+    .pin-dot.error   { background: #fca5a5; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-8px); }
+      60%     { transform: translateX(8px); }
+    }
+    .dots-shake .pin-dot { animation: shake 0.32s ease; }
+
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 72px);
+      grid-template-rows: repeat(4, 68px);
+      gap: 12px;
+    }
+    .pin-btn {
+      width: 72px; height: 68px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      font-size: 26px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s ease, transform 0.1s ease;
+      font-family: inherit;
+    }
+    .pin-btn:active { background: rgba(255,255,255,0.28); transform: scale(0.93); }
+    .pin-btn.ghost  { background: transparent; pointer-events: none; }
+    .pin-btn.del    { background: rgba(255,255,255,0.07); font-size: 20px; }
+
+    .pin-error {
+      color: #fca5a5;
+      font-size: 13px;
+      min-height: 18px;
+      text-align: center;
+    }
+
+    /* =====================================================
+       LAYOUT PRINCIPALE
+    ===================================================== */
+    #app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+    }
+    #app.hidden { display: none; }
+
+    .app-header {
+      height: var(--header-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-title {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.3px;
+    }
+    .header-week-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.2px;
+    }
+    .icon-btn {
+      width: 34px; height: 34px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: var(--text2);
+      transition: background var(--trans);
+    }
+    .icon-btn:active { background: var(--border); }
+
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: calc(var(--tab-h) + 4px);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 520px;
+      height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 10;
+    }
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      color: var(--text3);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      transition: color var(--trans);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      font-family: inherit;
+    }
+    .tab-btn .ti { font-size: 22px; line-height: 1; }
+    .tab-btn.active { color: var(--primary); }
+
+    /* =====================================================
+       LISTA SPESA
+    ===================================================== */
+    .shop-top {
+      padding: 12px 14px 10px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .input-row { display: flex; gap: 8px; flex: 1; }
+
+    .field {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 15px;
+      background: var(--surface2);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--trans);
+      font-family: inherit;
+      flex: 1;
+      -webkit-appearance: none;
+    }
+    .field:focus { border-color: var(--primary); }
+    .field::placeholder { color: var(--text3); }
+    .field.qty { flex: 0 0 76px; }
+
+    .btn-add {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      width: 44px; height: 44px;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--trans);
+      flex-shrink: 0;
+    }
+    .btn-add:active { background: var(--primary-dark); }
+
+    .shop-actions {
+      display: flex;
+      gap: 8px;
+      padding: 10px 14px 6px;
+    }
+
+    .btn-sm {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      font-family: inherit;
+      transition: all var(--trans);
+    }
+    .btn-sm:active { background: var(--border); }
+    .btn-sm.danger {
+      background: #FEF2F2;
+      border-color: #FCA5A5;
+      color: var(--danger);
+    }
+    .btn-sm.danger:active { background: #FEE2E2; }
+
+    .shop-list {
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .shop-item {
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      padding: 11px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: opacity var(--trans);
+    }
+    .shop-item.from-menu {
+      border-left-color: var(--accent);
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      border-left-width: 4px;
+    }
+    .shop-item.checked { opacity: 0.5; }
+    .shop-item.checked .item-name { text-decoration: line-through; }
+
+    .check-circle {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border2);
+      background: transparent;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      font-size: 13px;
+      color: transparent;
+    }
+    .check-circle.done {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+
+    .item-body { flex: 1; min-width: 0; }
+    .item-name {
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-qty { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .item-source {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .item-acts {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .tiny-btn {
+      width: 30px; height: 30px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--text3);
+      transition: all var(--trans);
+    }
+    .tiny-btn:active { background: var(--border); }
+    .tiny-btn.del:active { background: #FEE2E2; color: var(--danger); }
+    .tiny-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+    .empty-state {
+      text-align: center;
+      padding: 52px 24px;
+    }
+    .empty-icon { font-size: 52px; margin-bottom: 14px; }
+    .empty-title { font-size: 16px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+    .empty-sub { font-size: 14px; color: var(--text3); }
+
+    /* =====================================================
+       TAB MENU
+    ===================================================== */
+    .sub-tabs {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      padding: 0 14px;
+    }
+    .sub-tab-btn {
+      padding: 13px 0;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text3);
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      transition: all var(--trans);
+      font-family: inherit;
+      flex: 1;
+    }
+    .sub-tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .sub-panel { display: none; }
+    .sub-panel.active { display: block; }
+
+    /* Sezione Piatti */
+    .sec-header {
+      padding: 14px 14px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sec-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+    .btn-green {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 9px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background var(--trans);
+    }
+    .btn-green:active { background: var(--primary-dark); }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      padding: 0 14px 12px;
+    }
+    .pill {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all var(--trans);
+    }
+    .pill.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .dishes-grid {
+      padding: 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 20px;
+    }
+    .dish-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 13px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .type-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-primo   { background: #3B82F6; }
+    .dot-secondo { background: var(--accent); }
+
+    .dish-info { flex: 1; min-width: 0; }
+    .dish-name {
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dish-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+    .dish-acts { display: flex; gap: 4px; }
+
+    /* =====================================================
+       PIANO SETTIMANALE
+    ===================================================== */
+    .week-nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .arrow-btn {
+      width: 36px; height: 36px;
+      border: none;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--text2);
+      transition: all var(--trans);
+    }
+    .arrow-btn:active { background: var(--border); }
+
+    .week-info { text-align: center; }
+    .week-title { font-size: 15px; font-weight: 800; color: var(--text); }
+    .week-dates { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+    .week-note {
+      margin: 12px 14px 0;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      border: 1px solid;
+    }
+    .week-note.current { background: #EFF8F2; border-color: #86EFAC; color: #166534; }
+    .week-note.past    { background: var(--surface2); border-color: var(--border); color: var(--text2); }
+    .week-note.future  { background: var(--warning-bg); border-color: #FDE68A; color: var(--warning-text); }
+
+    @media (prefers-color-scheme: dark) {
+      .week-note.current { background: #0F2B1A; border-color: #166534; color: #86EFAC; }
+      .week-note.future  { background: #1E1600; border-color: #92400E; color: #FDE68A; }
+    }
+
+    .week-days {
+      padding: 12px 14px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .day-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .day-head {
+      padding: 9px 14px;
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .day-head.today { background: var(--primary-dark); }
+    .day-head.past  { background: var(--text3); }
+    .day-name-txt { font-size: 14px; font-weight: 700; }
+    .day-date-txt { font-size: 12px; opacity: 0.8; }
+
+    .day-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .meal-row { display: flex; align-items: center; gap: 8px; }
+    .meal-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      width: 50px;
+      flex-shrink: 0;
+    }
+    .meal-sel {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 8px 10px;
+      font-size: 13px;
+      background: var(--surface2);
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+      transition: border-color var(--trans);
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .meal-sel:focus { border-color: var(--primary); }
+    .meal-sel:disabled { opacity: 0.6; cursor: default; }
+
+    /* =====================================================
+       MODALE PIATTO (bottom sheet)
+    ===================================================== */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-bg.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-sheet {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      background: var(--surface);
+      border-radius: var(--radius) var(--radius) 0 0;
+      max-height: 92dvh;
+      overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform 0.24s ease;
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+    }
+    .modal-bg.open .modal-sheet { transform: translateY(0); }
+
+    .modal-handle {
+      width: 36px; height: 4px;
+      background: var(--border2);
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+    .modal-hdr {
+      padding: 14px 18px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-ttl { font-size: 18px; font-weight: 800; color: var(--text); }
+    .modal-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-ftr { padding: 0 18px 16px; display: flex; gap: 10px; }
+
+    .form-lbl {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+
+    .type-toggle {
+      display: flex;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .type-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--trans);
+      font-family: inherit;
+      color: var(--text2);
+    }
+    .type-btn.active-primo   { background: #EFF6FF; color: #2563EB; }
+    .type-btn.active-secondo { background: #FEF0E8; color: var(--accent); }
+
+    .ing-list { display: flex; flex-direction: column; gap: 8px; }
+    .ing-row  { display: flex; gap: 8px; align-items: center; }
+    .ing-row .field { font-size: 14px; padding: 8px 10px; }
+
+    .btn-add-ing {
+      width: 100%;
+      background: transparent;
+      border: 1.5px dashed var(--border2);
+      color: var(--text2);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all var(--trans);
+    }
+    .btn-add-ing:active { background: var(--border); }
+
+    .btn-cancel {
+      flex: 1;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      color: var(--text2);
+      border-radius: var(--radius-sm);
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all var(--trans);
+    }
+    .btn-cancel:active { background: var(--border); }
+
+    .btn-save {
+      flex: 1.5;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background var(--trans);
+    }
+    .btn-save:active { background: var(--primary-dark); }
+
+    /* =====================================================
+       TOAST
+    ===================================================== */
+    #toasts {
+      position: fixed;
+      bottom: calc(var(--tab-h) + 14px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+      width: min(calc(100% - 28px), 480px);
+      pointer-events: none;
+    }
+    .toast {
+      background: #1C1C1E;
+      color: #F5F5F3;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+      animation: tin 0.22s ease forwards;
+      pointer-events: all;
+    }
+    @keyframes tin  { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes tout { from { opacity:1; transform:translateY(0); }   to { opacity:0; transform:translateY(12px); } }
+    .toast.out { animation: tout 0.22s ease forwards; }
+
+    /* =====================================================
+       UTILITÀ
+    ===================================================== */
+    .hidden { display: none !important; }
+    select option { background: var(--surface); color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SCHERMATA PIN
+============================================================ -->
+<div id="pin-screen">
+  <div class="pin-logo">🏠</div>
+  <div>
+    <div class="pin-title" id="pin-title">Casa App</div>
+    <div class="pin-subtitle" id="pin-sub">Inserisci il PIN</div>
+  </div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="pd-0"></div>
+    <div class="pin-dot" id="pd-1"></div>
+    <div class="pin-dot" id="pd-2"></div>
+    <div class="pin-dot" id="pd-3"></div>
+  </div>
+  <div class="pin-error" id="pin-err"></div>
+  <div class="pin-keypad">
+    <button class="pin-btn" onclick="pinPress('1')">1</button>
+    <button class="pin-btn" onclick="pinPress('2')">2</button>
+    <button class="pin-btn" onclick="pinPress('3')">3</button>
+    <button class="pin-btn" onclick="pinPress('4')">4</button>
+    <button class="pin-btn" onclick="pinPress('5')">5</button>
+    <button class="pin-btn" onclick="pinPress('6')">6</button>
+    <button class="pin-btn" onclick="pinPress('7')">7</button>
+    <button class="pin-btn" onclick="pinPress('8')">8</button>
+    <button class="pin-btn" onclick="pinPress('9')">9</button>
+    <button class="pin-btn ghost"></button>
+    <button class="pin-btn" onclick="pinPress('0')">0</button>
+    <button class="pin-btn del" onclick="pinDel()">⌫</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP PRINCIPALE
+============================================================ -->
+<div id="app" class="hidden">
+
+  <!-- Header -->
+  <div class="app-header">
+    <div class="header-title">🏠 Casa App</div>
+    <div class="header-week-badge" id="hdr-week"></div>
+    <button class="icon-btn" onclick="lockApp()" title="Blocca">🔒</button>
+  </div>
+
+  <div class="main-content">
+
+    <!-- ====================================================
+         TAB: LISTA SPESA
+    ==================================================== -->
+    <div class="tab-panel active" id="tab-shop">
+
+      <!-- Form aggiungi -->
+      <div class="shop-top">
+        <div class="input-row">
+          <input class="field" id="ni-name" type="text" placeholder="Prodotto…"
+                 onkeydown="if(event.key==='Enter')addItem()">
+          <input class="field qty" id="ni-qty" type="text" placeholder="Qt."
+                 onkeydown="if(event.key==='Enter')addItem()">
+        </div>
+        <button class="btn-add" onclick="addItem()">+</button>
+      </div>
+
+      <!-- Pulsanti azione -->
+      <div class="shop-actions">
+        <button class="btn-sm" onclick="removeChecked()">✅ Rimuovi acquistati</button>
+        <button class="btn-sm danger" onclick="clearAll()">🗑 Svuota tutto</button>
+      </div>
+
+      <!-- Lista -->
+      <div class="shop-list" id="shop-list"></div>
+
+    </div>
+
+    <!-- ====================================================
+         TAB: MENU
+    ==================================================== -->
+    <div class="tab-panel" id="tab-menu">
+
+      <!-- Sub-tabs -->
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active" id="st-dishes-btn" onclick="switchSub('dishes')">🍝 Piatti</button>
+        <button class="sub-tab-btn" id="st-plan-btn" onclick="switchSub('plan')">📅 Piano Settimanale</button>
+      </div>
+
+      <!-- ---- Piatti ---- -->
+      <div class="sub-panel active" id="st-dishes">
+        <div class="sec-header">
+          <span class="sec-title">I miei piatti</span>
+          <button class="btn-green" onclick="openModal()">+ Nuovo piatto</button>
+        </div>
+        <div class="filter-row">
+          <button class="pill active" data-f="all"     onclick="setFilter(this,'all')">Tutti</button>
+          <button class="pill"        data-f="primo"   onclick="setFilter(this,'primo')">🔵 Primi</button>
+          <button class="pill"        data-f="secondo" onclick="setFilter(this,'secondo')">🟠 Secondi</button>
+        </div>
+        <div class="dishes-grid" id="dishes-list"></div>
+      </div>
+
+      <!-- ---- Piano Settimanale ---- -->
+      <div class="sub-panel" id="st-plan">
+        <div class="week-nav">
+          <button class="arrow-btn" onclick="shiftWeek(-1)">‹</button>
+          <div class="week-info">
+            <div class="week-title" id="wk-title"></div>
+            <div class="week-dates" id="wk-dates"></div>
+          </div>
+          <button class="arrow-btn" onclick="shiftWeek(1)">›</button>
+        </div>
+        <div class="week-note hidden" id="wk-note"></div>
+        <div class="week-days" id="week-days"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tb-shop" onclick="switchTab('shop')">
+      <span class="ti">🛒</span><span>Lista Spesa</span>
+    </button>
+    <button class="tab-btn" id="tb-menu" onclick="switchTab('menu')">
+      <span class="ti">🍽️</span><span>Menu</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     MODALE: AGGIUNGI / MODIFICA PIATTO
+============================================================ -->
+<div class="modal-bg" id="modal-bg" onclick="handleBgClick(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-ttl" id="modal-ttl">Nuovo piatto</div>
+      <button class="icon-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div>
+        <label class="form-lbl">Nome</label>
+        <input class="field" id="d-name" type="text" placeholder="es. Pasta al pomodoro"
+               style="width:100%">
+      </div>
+
+      <div>
+        <label class="form-lbl">Tipo</label>
+        <div class="type-toggle">
+          <button class="type-btn active-primo" id="t-primo"   onclick="setType('primo')">🔵 Primo</button>
+          <button class="type-btn"              id="t-secondo" onclick="setType('secondo')">🟠 Secondo</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="form-lbl">Ingredienti</label>
+        <div class="ing-list" id="ing-list"></div>
+        <button class="btn-add-ing" onclick="addIngRow()" style="margin-top:8px">
+          + Aggiungi ingrediente
+        </button>
+      </div>
+
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="closeModal()">Annulla</button>
+      <button class="btn-save"   onclick="saveDish()">Salva piatto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toasts"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+'use strict';
+
+/* ============================================================
+   COSTANTI
+============================================================ */
+const GIORNI   = ['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
+const GIORNI_K = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+const MESI     = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+
+/* ============================================================
+   STATO
+============================================================ */
+const S = {
+  pin: { buf: '', step: 'enter', first: '' }, // step: 'enter'|'setup1'|'setup2'
+  tab: 'shop',
+  sub: 'dishes',
+  filter: 'all',
+  modal: { open: false, editId: null, type: 'primo' },
+  viewWeek: '',
+};
+
+/* ============================================================
+   STORAGE
+============================================================ */
+const load = (k, def) => { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : def; } catch { return def; } };
+const save = (k, v)   => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.error(e); } };
+
+const getList   = ()  => load('shop_v2', []);
+const saveList  = (l) => save('shop_v2', l);
+const getDishes = ()  => load('dishes_v2', []);
+const saveDishes= (d) => save('dishes_v2', d);
+const getPlans  = ()  => load('plans_v2', {});
+const savePlans = (p) => save('plans_v2', p);
+const getPin    = ()  => load('pin_v2', null);
+const savePin   = (p) => save('pin_v2', p);
+
+/* ============================================================
+   UTILITÀ DATA / SETTIMANA
+============================================================ */
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function isoWeekKey(date = new Date()) {
+  const d = new Date(date); d.setHours(0,0,0,0);
+  const day = d.getDay() || 7;
+  d.setDate(d.getDate() + 4 - day);
+  const y1 = new Date(d.getFullYear(), 0, 1);
+  const wn = Math.ceil((((d - y1) / 86400000) + 1) / 7);
+  return `${d.getFullYear()}-W${String(wn).padStart(2,'0')}`;
+}
+
+function weekDates(key) {
+  const [yr, wPart] = key.split('-W');
+  const year = +yr, wn = +wPart;
+  const jan4 = new Date(year, 0, 4);
+  const dow   = jan4.getDay() || 7;
+  const mon1  = new Date(jan4); mon1.setDate(jan4.getDate() - dow + 1);
+  return Array.from({length:7}, (_,i) => {
+    const d = new Date(mon1); d.setDate(mon1.getDate() + (wn-1)*7 + i); return d;
+  });
+}
+
+function shiftKey(key, n) {
+  const dates = weekDates(key);
+  const mon = new Date(dates[0]); mon.setDate(mon.getDate() + n*7);
+  return isoWeekKey(mon);
+}
+
+function fmtDate(d) { return `${d.getDate()} ${MESI[d.getMonth()]}`; }
+
+function isToday(d) {
+  const t = new Date();
+  return d.getDate()===t.getDate() && d.getMonth()===t.getMonth() && d.getFullYear()===t.getFullYear();
+}
+
+/* ============================================================
+   PIN
+============================================================ */
+function initPin() {
+  const pin = getPin();
+  if (!pin) {
+    S.pin.step = 'setup1';
+    document.getElementById('pin-sub').textContent = 'Imposta un PIN a 4 cifre';
+  } else {
+    S.pin.step = 'enter';
+    document.getElementById('pin-sub').textContent = 'Inserisci il PIN per accedere';
+  }
+  S.pin.buf = ''; S.pin.first = '';
+  refreshDots();
+}
+
+function pinPress(d) {
+  if (S.pin.buf.length >= 4) return;
+  S.pin.buf += d;
+  refreshDots();
+  if (S.pin.buf.length === 4) setTimeout(pinDone, 120);
+}
+
+function pinDel() {
+  S.pin.buf = S.pin.buf.slice(0,-1);
+  refreshDots();
+  document.getElementById('pin-err').textContent = '';
+}
+
+function refreshDots() {
+  for (let i=0;i<4;i++) {
+    const el = document.getElementById(`pd-${i}`);
+    el.className = 'pin-dot' + (i < S.pin.buf.length ? ' filled' : '');
+  }
+}
+
+function pinDone() {
+  if (S.pin.step === 'enter') {
+    if (S.pin.buf === getPin()) { doUnlock(); }
+    else { pinError('PIN errato. Riprova.'); }
+
+  } else if (S.pin.step === 'setup1') {
+    S.pin.first = S.pin.buf;
+    S.pin.buf   = '';
+    S.pin.step  = 'setup2';
+    document.getElementById('pin-sub').textContent = 'Conferma il PIN';
+    refreshDots();
+
+  } else if (S.pin.step === 'setup2') {
+    if (S.pin.buf === S.pin.first) {
+      savePin(S.pin.buf);
+      doUnlock();
+    } else {
+      S.pin.step = 'setup1'; S.pin.first = '';
+      document.getElementById('pin-sub').textContent = 'Imposta un PIN a 4 cifre';
+      pinError('I PIN non coincidono. Riprova.');
+    }
+  }
+}
+
+function pinError(msg) {
+  document.getElementById('pin-err').textContent = msg;
+  S.pin.buf = ''; refreshDots();
+  const dots = document.getElementById('pin-dots');
+  dots.classList.add('dots-shake');
+  setTimeout(() => dots.classList.remove('dots-shake'), 400);
+}
+
+function doUnlock() {
+  S.pin.buf = '';
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('app').classList.remove('hidden');
+  initApp();
+}
+
+function lockApp() {
+  S.pin.buf = ''; S.pin.first = '';
+  document.getElementById('pin-screen').style.display = '';
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('pin-err').textContent = '';
+  initPin();
+}
+
+/* ============================================================
+   INIT APP
+============================================================ */
+function initApp() {
+  S.viewWeek = isoWeekKey();
+  document.getElementById('hdr-week').textContent = `Sett. ${S.viewWeek.split('-W')[1]}`;
+  renderList();
+  renderDishes();
+  renderWeekPlan();
+}
+
+/* ============================================================
+   NAVIGAZIONE TAB
+============================================================ */
+function switchTab(t) {
+  S.tab = t;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${t}`).classList.add('active');
+  document.getElementById(`tb-${t}`).classList.add('active');
+}
+
+function switchSub(s) {
+  S.sub = s;
+  document.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`st-${s}`).classList.add('active');
+  document.getElementById(`st-${s}-btn`).classList.add('active');
+  if (s === 'plan') renderWeekPlan();
+}
+
+/* ============================================================
+   LISTA SPESA
+============================================================ */
+function addItem() {
+  const nameEl = document.getElementById('ni-name');
+  const qtyEl  = document.getElementById('ni-qty');
+  const name   = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+
+  const list = getList();
+  list.push({ id: uid(), name, qty: qtyEl.value.trim(), done: false, menu: false, dishId: null, dishName: '', slot: null });
+  saveList(list);
+  nameEl.value = ''; qtyEl.value = ''; nameEl.focus();
+  renderList();
+}
+
+function toggleItem(id) {
+  const list = getList();
+  const it = list.find(i => i.id === id);
+  if (it) it.done = !it.done;
+  saveList(list); renderList();
+}
+
+function delItem(id) {
+  saveList(getList().filter(i => i.id !== id));
+  renderList();
+}
+
+function moveItem(id, dir) {
+  const list = getList();
+  const idx  = list.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  const ni = idx + dir;
+  if (ni < 0 || ni >= list.length) return;
+  [list[idx], list[ni]] = [list[ni], list[idx]];
+  saveList(list); renderList();
+}
+
+function removeChecked() {
+  const list = getList();
+  const rem  = list.filter(i => i.done).length;
+  saveList(list.filter(i => !i.done));
+  renderList();
+  if (rem > 0) toast(`${rem} element${rem>1?'i':'o'} rimoss${rem>1?'i':'o'}`);
+}
+
+function clearAll() {
+  if (!confirm('Svuotare tutta la lista della spesa?\n(Il piano settimanale rimane invariato.)')) return;
+  saveList([]);
+  renderList();
+  toast('Lista svuotata');
+}
+
+function renderList() {
+  const list = getList();
+  const el   = document.getElementById('shop-list');
+
+  if (!list.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <div class="empty-title">Lista vuota</div>
+        <div class="empty-sub">Aggiungi prodotti con il campo qui sopra,<br>o seleziona piatti nel piano settimanale</div>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map((it, idx) => `
+    <div class="shop-item ${it.menu?'from-menu':''} ${it.done?'checked':''}" id="si-${it.id}">
+      <div class="check-circle ${it.done?'done':''}" onclick="toggleItem('${it.id}')">${it.done?'✓':''}</div>
+      <div class="item-body">
+        <div class="item-name">${esc(it.name)}</div>
+        ${it.qty  ? `<div class="item-qty">${esc(it.qty)}</div>` : ''}
+        ${it.menu && it.dishName ? `<div class="item-source">🍽️ ${esc(it.dishName)}</div>` : ''}
+      </div>
+      <div class="item-acts">
+        <button class="tiny-btn" onclick="moveItem('${it.id}',-1)" ${idx===0?'disabled':''}>↑</button>
+        <button class="tiny-btn" onclick="moveItem('${it.id}',1)"  ${idx===list.length-1?'disabled':''}>↓</button>
+        <button class="tiny-btn del" onclick="delItem('${it.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   PIATTI
+============================================================ */
+function setFilter(btn, f) {
+  S.filter = f;
+  document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDishes();
+}
+
+function renderDishes() {
+  let dishes = getDishes();
+  if (S.filter !== 'all') dishes = dishes.filter(d => d.type === S.filter);
+
+  const el = document.getElementById('dishes-list');
+
+  if (!dishes.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${S.filter==='secondo'?'🥩':'🍝'}</div>
+        <div class="empty-title">Nessun piatto</div>
+        <div class="empty-sub">Clicca "+ Nuovo piatto" per aggiungere</div>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = dishes.map(d => `
+    <div class="dish-card">
+      <div class="type-dot ${d.type==='primo'?'dot-primo':'dot-secondo'}"></div>
+      <div class="dish-info">
+        <div class="dish-name">${esc(d.name)}</div>
+        <div class="dish-meta">
+          ${d.type==='primo'?'Primo piatto':'Secondo piatto'}
+          · ${d.ings.length} ingredient${d.ings.length!==1?'i':'e'}
+        </div>
+      </div>
+      <div class="dish-acts">
+        <button class="tiny-btn" onclick="openModal('${d.id}')">✏️</button>
+        <button class="tiny-btn del" onclick="deleteDish('${d.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ---- Modale piatto ---- */
+function openModal(id = null) {
+  S.modal.editId = id;
+  const isEdit   = !!id;
+
+  document.getElementById('modal-ttl').textContent = isEdit ? 'Modifica piatto' : 'Nuovo piatto';
+  document.getElementById('ing-list').innerHTML = '';
+
+  if (isEdit) {
+    const d = getDishes().find(x => x.id === id);
+    if (!d) return;
+    document.getElementById('d-name').value = d.name;
+    S.modal.type = d.type;
+    d.ings.forEach(i => addIngRow(i.name, i.qty));
+  } else {
+    document.getElementById('d-name').value = '';
+    S.modal.type = 'primo';
+    addIngRow();
+  }
+
+  refreshTypeBtns();
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(() => document.getElementById('d-name').focus(), 280);
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+function handleBgClick(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModal();
+}
+
+function setType(t) { S.modal.type = t; refreshTypeBtns(); }
+
+function refreshTypeBtns() {
+  document.getElementById('t-primo').className   = `type-btn ${S.modal.type==='primo'  ?'active-primo':''}`;
+  document.getElementById('t-secondo').className = `type-btn ${S.modal.type==='secondo'?'active-secondo':''}`;
+}
+
+function addIngRow(name='', qty='') {
+  const row = document.createElement('div');
+  row.className = 'ing-row';
+  row.innerHTML = `
+    <input class="field" type="text" placeholder="Ingrediente" value="${esc(name)}" style="flex:2">
+    <input class="field" type="text" placeholder="Qt."         value="${esc(qty)}"  style="flex:1">
+    <button class="tiny-btn del" onclick="this.parentElement.remove()" style="flex-shrink:0">✕</button>
+  `;
+  document.getElementById('ing-list').appendChild(row);
+}
+
+function saveDish() {
+  const name = document.getElementById('d-name').value.trim();
+  if (!name) { alert('Inserisci il nome del piatto.'); return; }
+
+  const ings = [...document.querySelectorAll('#ing-list .ing-row')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    return { name: inputs[0].value.trim(), qty: inputs[1].value.trim() };
+  }).filter(i => i.name);
+
+  let dishes = getDishes();
+
+  if (S.modal.editId) {
+    const idx = dishes.findIndex(d => d.id === S.modal.editId);
+    if (idx >= 0) {
+      const old = dishes[idx];
+      dishes[idx] = { ...old, name, type: S.modal.type, ings };
+      // Aggiorna gli ingredienti nella lista spesa se questo piatto era già selezionato
+      syncDishInList(S.modal.editId, ings, name);
+    }
+  } else {
+    dishes.push({ id: uid(), name, type: S.modal.type, ings });
+  }
+
+  saveDishes(dishes);
+  closeModal();
+  renderDishes();
+  // Aggiorna anche i select del piano (i nomi potrebbero essere cambiati)
+  if (S.sub === 'plan') renderWeekPlan();
+  toast(S.modal.editId ? 'Piatto aggiornato' : 'Piatto aggiunto ✓');
+}
+
+function syncDishInList(dishId, newIngs, dishName) {
+  let list  = getList();
+  const slots = [...new Set(list.filter(i => i.dishId===dishId && i.menu).map(i => i.slot))];
+  if (!slots.length) return;
+  slots.forEach(slot => {
+    list = list.filter(i => !(i.dishId===dishId && i.slot===slot));
+    newIngs.forEach(ing => list.push({ id:uid(), name:ing.name, qty:ing.qty, done:false, menu:true, dishId, dishName, slot }));
+  });
+  saveList(list);
+  renderList();
+}
+
+function deleteDish(id) {
+  if (!confirm('Eliminare questo piatto? Verrà rimosso anche dal piano settimanale.')) return;
+
+  let dishes = getDishes();
+  dishes = dishes.filter(d => d.id !== id);
+  saveDishes(dishes);
+
+  // Rimuovi da tutti i piani
+  const plans = getPlans();
+  Object.keys(plans).forEach(wk => {
+    GIORNI_K.forEach(day => {
+      ['primo','secondo'].forEach(meal => {
+        if (plans[wk][day] && plans[wk][day][meal] === id) {
+          plans[wk][day][meal] = null;
+          removeMealFromList(id, `${wk}-${day}-${meal}`);
+        }
+      });
+    });
+  });
+  savePlans(plans);
+
+  renderDishes();
+  if (S.sub==='plan') renderWeekPlan();
+  renderList();
+  toast('Piatto eliminato');
+}
+
+/* ============================================================
+   PIANO SETTIMANALE
+============================================================ */
+function shiftWeek(n) {
+  S.viewWeek = shiftKey(S.viewWeek, n);
+  renderWeekPlan();
+}
+
+function renderWeekPlan() {
+  const wk      = S.viewWeek;
+  const nowWk   = isoWeekKey();
+  const prevWk  = shiftKey(wk, -1);
+
+  const plans   = getPlans();
+  const wkPlan  = plans[wk]  || {};
+  const prevPlan= plans[prevWk] || {};
+  const dates   = weekDates(wk);
+
+  // Piatti usati la settimana scorsa
+  const prevIds = new Set();
+  GIORNI_K.forEach(day => {
+    if (prevPlan[day]) {
+      if (prevPlan[day].primo)   prevIds.add(prevPlan[day].primo);
+      if (prevPlan[day].secondo) prevIds.add(prevPlan[day].secondo);
+    }
+  });
+
+  const wn = wk.split('-W')[1];
+  document.getElementById('wk-title').textContent = `Settimana ${wn}`;
+  document.getElementById('wk-dates').textContent =
+    `${fmtDate(dates[0])} – ${fmtDate(dates[6])} ${dates[0].getFullYear()}`;
+
+  const noteEl = document.getElementById('wk-note');
+  const isPast = wk < nowWk, isCurr = wk === nowWk, isFut = wk > nowWk;
+  noteEl.classList.remove('hidden','current','past','future');
+  if (isCurr) {
+    noteEl.className = 'week-note current';
+    noteEl.textContent = '📌 Settimana corrente — i piatti selezionati vengono aggiunti alla lista spesa';
+  } else if (isPast) {
+    noteEl.className = 'week-note past';
+    noteEl.textContent = '📚 Settimana passata — sola lettura';
+  } else {
+    noteEl.className = 'week-note future';
+    noteEl.textContent = '🔮 Settimana futura — pianificazione (non sincronizza la spesa)';
+  }
+
+  const dishes = getDishes();
+  const primi   = dishes.filter(d => d.type==='primo');
+  const secondi = dishes.filter(d => d.type==='secondo');
+  const ro = !isCurr; // past & future: read-only per la spesa; past anche disabilitato
+
+  const container = document.getElementById('week-days');
+  container.innerHTML = '';
+
+  GIORNI.forEach((gName, idx) => {
+    const dayKey  = GIORNI_K[idx];
+    const dayPlan = wkPlan[dayKey] || { primo: null, secondo: null };
+    const date    = dates[idx];
+    const today   = isToday(date);
+    const headCls = today ? 'today' : isPast ? 'past' : '';
+    const disabled = isPast ? 'disabled' : '';
+
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.innerHTML = `
+      <div class="day-head ${headCls}">
+        <span class="day-name-txt">${gName}${today ? ' 📍' : ''}</span>
+        <span class="day-date-txt">${fmtDate(date)}</span>
+      </div>
+      <div class="day-body">
+        <div class="meal-row">
+          <span class="meal-lbl">Primo</span>
+          <select class="meal-sel" ${disabled}
+                  onchange="onMealChange('${wk}','${dayKey}','primo',this.value)">
+            <option value="">— nessun piatto —</option>
+            ${buildOpts(primi, dayPlan.primo, prevIds)}
+          </select>
+        </div>
+        <div class="meal-row">
+          <span class="meal-lbl">Secondo</span>
+          <select class="meal-sel" ${disabled}
+                  onchange="onMealChange('${wk}','${dayKey}','secondo',this.value)">
+            <option value="">— nessun piatto —</option>
+            ${buildOpts(secondi, dayPlan.secondo, prevIds)}
+          </select>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function buildOpts(dishes, selId, prevIds) {
+  return dishes.map(d => {
+    const warn = prevIds.has(d.id) ? '⚠️ ' : '';
+    const note = prevIds.has(d.id) ? ' (sett. scorsa)' : '';
+    const sel  = selId === d.id ? 'selected' : '';
+    return `<option value="${d.id}" ${sel}>${esc(warn + d.name + note)}</option>`;
+  }).join('');
+}
+
+function onMealChange(wk, dayKey, meal, dishId) {
+  const plans   = getPlans();
+  if (!plans[wk]) plans[wk] = {};
+  if (!plans[wk][dayKey]) plans[wk][dayKey] = { primo: null, secondo: null };
+
+  const oldId = plans[wk][dayKey][meal];
+  const slot  = `${wk}-${dayKey}-${meal}`;
+
+  // Rimuovi vecchi ingredienti
+  if (oldId) removeMealFromList(oldId, slot);
+
+  // Salva nuova selezione
+  plans[wk][dayKey][meal] = dishId || null;
+  savePlans(plans);
+
+  // Aggiungi nuovi ingredienti (solo settimana corrente)
+  if (dishId && wk === isoWeekKey()) {
+    addMealToList(dishId, slot);
+  }
+
+  renderList();
+}
+
+function addMealToList(dishId, slot) {
+  const dish = getDishes().find(d => d.id === dishId);
+  if (!dish) return;
+  const list = getList();
+  dish.ings.forEach(ing => list.push({
+    id: uid(), name: ing.name, qty: ing.qty,
+    done: false, menu: true, dishId, dishName: dish.name, slot
+  }));
+  saveList(list);
+}
+
+function removeMealFromList(dishId, slot) {
+  saveList(getList().filter(i => !(i.dishId===dishId && i.slot===slot)));
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+function toast(msg, ms=2400) {
+  const c = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 240); }, ms);
+}
+
+/* ============================================================
+   ESCAPE HTML
+============================================================ */
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ============================================================
+   AVVIO
+============================================================ */
+document.addEventListener('DOMContentLoaded', initPin);
+</script>
+</body>
+</html>
