@@ -6,131 +6,254 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
+    /* Palette e base ispirate alla Casa App che hai allegato */
     :root {
-      --bg: #f5f5f5;
-      --bg-card: #ffffff;
-      --bg-accent: #e0f3ff;
-      --border: #d0d0d0;
-      --text: #222222;
-      --text-muted: #666666;
-      --primary: #0077b6;
-      --primary-dark: #005682;
-      --danger: #c92a2a;
-      --radius: 0.5rem;
-      --space: 0.75rem;
+      --primary:        #2B5540;
+      --primary-light:  #3D7A5A;
+      --primary-dark:   #1D3D2E;
+      --accent:         #C55D2B;
+      --accent-bg:      #FEF0E8;
+      --accent-border:  #C55D2B;
+      --success:        #34C759;
+      --danger:         #FF3B30;
+
+      --bg:       #F7F6F2;
+      --surface:  #FFFFFF;
+      --surface2: #FAF9F7;
+      --border:   #E8E5DF;
+      --border2:  #D1CEC6;
+
+      --text:  #1C1C1E;
+      --text2: #636366;
+      --text3: #AEAEB2;
+
+      --radius-xl: 18px;
+      --radius:    14px;
+      --radius-sm: 10px;
+      --radius-xs: 7px;
+
+      --shadow-soft: 0 6px 18px rgba(0,0,0,0.06);
+      --shadow-chip: 0 2px 8px rgba(0,0,0,0.06);
+
+      --header-h: 54px;
+      --tab-h:    60px;
+
+      --trans: 0.18s ease;
     }
 
-    * { box-sizing: border-box; }
-    body {
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:       #111110;
+        --surface:  #1C1C1A;
+        --surface2: #242422;
+        --border:   #3A3A37;
+        --border2:  #4A4A46;
+
+        --text:  #F5F5F3;
+        --text2: #8E8E8B;
+        --text3: #5A5A57;
+
+        --accent-bg: #2E1A0F;
+      }
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #fdfbf7 0, var(--bg) 55%);
       color: var(--text);
-      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
-      align-items: stretch;
       justify-content: center;
+      -webkit-tap-highlight-color: transparent;
     }
 
     #app-root {
       width: 100%;
-      max-width: 960px;
-      padding: 1rem;
+      max-width: 520px;
+      padding: 10px 10px 0;
     }
 
     .card {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
       padding: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(0,0,0,0.02);
     }
+
+    /* HEADER */
 
     header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 0.75rem;
+      padding: 6px 4px 0;
     }
 
     header h1 {
-      font-size: 1.4rem;
-      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--primary);
+      flex: 1;
+    }
+
+    .header-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill-chip {
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--surface2);
+      color: var(--text2);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-chip);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--primary);
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text2);
+      cursor: pointer;
+      transition: background var(--trans), transform 0.12s ease;
+      font-size: 15px;
+    }
+    .icon-btn:active {
+      background: rgba(0,0,0,0.06);
+      transform: scale(0.93);
     }
 
     button {
-      border-radius: 999px;
-      border: 1px solid transparent;
-      padding: 0.3rem 0.8rem;
-      background: var(--primary);
-      color: #ffffff;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
+      font-family: inherit;
     }
-    button:hover { background: var(--primary-dark); }
-    button.secondary {
-      background: transparent;
-      color: var(--primary);
-      border-color: var(--primary);
-    }
-    button.secondary:hover {
-      background: rgba(0,0,0,0.03);
-    }
-    button.danger {
-      background: var(--danger);
-      border-color: var(--danger);
-    }
+
+    /* TAB SWITCH (in alto, stile pillole) */
 
     .tabs {
       display: flex;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
+      gap: 6px;
+      padding: 0 4px 8px;
+      margin-bottom: 0.25rem;
+      background: transparent;
     }
+
     .tabs button {
       flex: 1;
-      justify-content: center;
       border-radius: 999px;
-      padding-block: 0.45rem;
-      background: transparent;
-      color: var(--text-muted);
-      border-color: var(--border);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text3);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 7px 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all var(--trans);
     }
+
     .tabs button.active {
       background: var(--primary);
-      color: #fff;
       border-color: var(--primary);
+      color: #fff;
+      box-shadow: var(--shadow-chip);
+    }
+
+    .tabs button span.icon {
+      font-size: 17px;
+      line-height: 1;
     }
 
     .hidden { display: none !important; }
 
     h2 {
-      font-size: 1.1rem;
+      font-size: 17px;
+      font-weight: 800;
       margin-top: 0;
       margin-bottom: 0.6rem;
-    }
-    h3 {
-      font-size: 1rem;
-      margin-top: 0;
-      margin-bottom: 0.5rem;
+      letter-spacing: -0.3px;
+      color: var(--text);
     }
 
-    label { display: block; font-size: 0.85rem; margin-bottom: 0.15rem; }
+    h3 {
+      font-size: 15px;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+      margin-bottom: 0.2rem;
+      color: var(--text3);
+    }
 
     input[type="text"],
     input[type="password"],
     textarea,
     select {
       width: 100%;
-      border-radius: 0.4rem;
-      border: 1px solid var(--border);
-      padding: 0.35rem 0.5rem;
-      font-size: 0.9rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      padding: 10px 11px;
+      font-size: 14px;
+      background: var(--surface2);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--trans), background var(--trans);
+      -webkit-appearance: none;
     }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--text3);
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+    }
+
     textarea {
       resize: vertical;
       min-height: 3.5rem;
@@ -138,167 +261,405 @@
 
     .row {
       display: flex;
-      gap: 0.75rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
     }
+
     .row > .col {
       flex: 1;
       min-width: min(100%, 260px);
     }
 
+    /* Pulsanti generici */
+
+    .btn-primary {
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 9px 16px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background var(--trans), transform 0.12s ease;
+    }
+
+    .btn-primary:active {
+      background: var(--primary-dark);
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border2);
+      background: var(--surface);
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all var(--trans);
+    }
+
+    .btn-secondary:active {
+      background: var(--border);
+    }
+
+    .btn-danger {
+      border-radius: var(--radius-sm);
+      border: 1.5px solid #FCA5A5;
+      background: #FEF2F2;
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background var(--trans);
+    }
+
+    .btn-danger:active {
+      background: #FEE2E2;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 0.4rem;
+    }
+
+    /* LISTA SPESA */
+
     .shopping-actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 0.4rem;
       margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.3rem;
+      flex-wrap: wrap;
     }
 
     #shopping-list {
       list-style: none;
       padding-left: 0;
-      margin: 0;
+      margin: 0.2rem 0 0;
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
     }
 
     .shopping-item {
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      padding: 10px 11px;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.3rem 0.4rem;
-      border-radius: 0.4rem;
-      border: 1px solid var(--border);
-      background: #fff;
+      gap: 10px;
+      transition: opacity var(--trans), background var(--trans), border-color var(--trans);
     }
+
     .shopping-item.menu {
-      background: var(--bg-accent);
-      border-color: #9ad1ff;
+      border-left-color: var(--accent);
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
     }
+
+    .shopping-item.purchased {
+      opacity: 0.55;
+    }
+
     .shopping-item label {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 10px;
       margin: 0;
       flex: 1;
       cursor: pointer;
     }
-    .shopping-item-name {
-      font-size: 0.9rem;
-    }
-    .shopping-item-qty {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-    .shopping-item.purchased .shopping-item-name,
-    .shopping-item.purchased .shopping-item-qty {
-      text-decoration: line-through;
-      color: var(--text-muted);
-    }
 
-    .small-btn {
-      padding-inline: 0.45rem;
-      padding-block: 0.2rem;
-      font-size: 0.75rem;
+    .check-circle {
+      width: 24px;
+      height: 24px;
       border-radius: 999px;
-      border-width: 1px;
+      border: 2px solid var(--border2);
       background: transparent;
-      color: var(--text-muted);
-      border-color: var(--border);
-    }
-    .small-btn:hover {
-      background: rgba(0,0,0,0.04);
-    }
-
-    .hint {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.4rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: transparent;
+      transition: all 0.15s ease;
     }
 
-    /* Dishes & week plan */
+    .check-circle.done {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+
+    .shopping-item-name {
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .shopping-item-qty {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 1px;
+    }
+
+    .shopping-item-source {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .item-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .tiny-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text3);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: background var(--trans), color var(--trans), transform 0.12s ease;
+    }
+
+    .tiny-btn:active {
+      background: var(--border);
+      transform: scale(0.95);
+    }
+
+    .tiny-btn.del:active {
+      background: #FEE2E2;
+      color: var(--danger);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 8px 10px;
+      font-size: 13px;
+      color: var(--text3);
+    }
+
+    /* MENU: Piatti + Piano settimanale */
+
     .dish-list {
       list-style: none;
       padding-left: 0;
-      margin: 0;
+      margin: 0.25rem 0 0;
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.35rem;
       max-height: 220px;
       overflow: auto;
-      border-radius: 0.4rem;
-      border: 1px solid var(--border);
-      padding: 0.35rem;
-      background: #fafafa;
     }
 
     .dish-item {
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      padding: 8px 10px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 0.4rem;
-      padding: 0.2rem 0.35rem;
-      border-radius: 0.35rem;
+      gap: 10px;
     }
+
+    .dish-type-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .dish-type-dot.primo { background: #3B82F6; }
+    .dish-type-dot.secondo { background: var(--accent); }
+
+    .dish-body {
+      flex: 1;
+      min-width: 0;
+    }
+
     .dish-item-name {
-      font-size: 0.88rem;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+
     .dish-item-meta {
-      font-size: 0.75rem;
-      color: var(--text-muted);
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
-    }
-    th, td {
+      font-size: 12px;
+      margin-top: 0.4rem;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface2);
       border: 1px solid var(--border);
-      padding: 0.4rem;
-      vertical-align: top;
-    }
-    th {
-      background: #f0f0f0;
-      text-align: left;
-      white-space: nowrap;
-    }
-    .slot-title {
-      font-weight: 600;
-      margin-bottom: 0.2rem;
-    }
-    .slot {
-      margin-bottom: 0.25rem;
     }
 
-    /* Lock screen */
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 6px 6px;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface);
+      text-align: left;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .slot-title {
+      font-weight: 600;
+      margin-bottom: 1px;
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .slot {
+      margin-bottom: 4px;
+    }
+
+    .slot select {
+      font-size: 12px;
+      padding: 6px 7px;
+    }
+
+    /* Schermata lock */
+
     #lock-screen {
       position: fixed;
       inset: 0;
-      background: var(--bg);
+      max-width: 520px;
+      margin: 0 auto;
+      background: radial-gradient(circle at top, #355c47 0, #172b22 55%);
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 1rem;
+      padding: 40px 24px;
       z-index: 10;
     }
+
     #lock-inner {
       width: 100%;
       max-width: 420px;
+      background: rgba(0,0,0,0.14);
+      border-radius: 28px;
+      padding: 22px 20px 18px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+      color: #fff;
     }
-    .center {
+
+    #lock-inner h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
       text-align: center;
+      margin-bottom: 6px;
     }
+
+    #lock-inner p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    #lock-inner label {
+      color: #f9fafb;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    #lock-inner input[type="password"] {
+      background: rgba(0,0,0,0.22);
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    #lock-inner input[type="password"]::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+
+    #lock-inner button {
+      border-radius: 999px;
+      border: none;
+      background: #F9FAFB;
+      color: #1F2933;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: background 0.15s ease, transform 0.12s ease;
+    }
+
+    #lock-inner button:active {
+      background: #E5E7EB;
+      transform: scale(0.97);
+    }
+
+    .center { text-align: center; }
+
     .error {
-      color: var(--danger);
-      font-size: 0.8rem;
-      margin-top: 0.25rem;
+      color: #FCA5A5;
+      font-size: 12px;
+      min-height: 18px;
+      text-align: center;
+      margin-top: 4px;
     }
 
     @media (max-width: 600px) {
-      header h1 { font-size: 1.2rem; }
-      .shopping-item-name { font-size: 0.86rem; }
+      header h1 { font-size: 18px; }
+      .shopping-item-name { font-size: 14px; }
     }
   </style>
 </head>
@@ -306,13 +667,13 @@
   <div id="app-root">
     <!-- LOCK / PIN -->
     <div id="lock-screen">
-      <div id="lock-inner" class="card">
-        <h1 class="center">Spesa & Menu</h1>
+      <div id="lock-inner">
+        <h1>Spesa & Menu</h1>
         <div id="pin-setup">
           <p>Imposta un codice di accesso (4–10 cifre) per proteggere l'app.</p>
           <label for="new-pin">Nuovo codice</label>
-          <input type="password" id="new-pin" inputmode="numeric" autocomplete="off">
-          <div style="margin-top:0.6rem; display:flex; justify-content:flex-end;">
+          <input type="password" id="new-pin" inputmode="numeric" autocomplete="off" placeholder="••••">
+          <div style="margin-top:0.9rem; display:flex; justify-content:flex-end;">
             <button id="set-pin-btn">Salva codice</button>
           </div>
         </div>
@@ -320,9 +681,11 @@
         <div id="pin-login" class="hidden">
           <p>Inserisci il codice di accesso.</p>
           <label for="pin-input">Codice</label>
-          <input type="password" id="pin-input" inputmode="numeric" autocomplete="off">
-          <div style="margin-top:0.6rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-            <span class="hint">Se sbagli più volte, puoi cancellare i dati dal browser.</span>
+          <input type="password" id="pin-input" inputmode="numeric" autocomplete="off" placeholder="••••">
+          <div style="margin-top:0.9rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+            <span style="font-size:11px; color:rgba(255,255,255,0.65); text-align:left;">
+              Se sbagli più volte, puoi cancellare i dati dal browser.
+            </span>
             <button id="login-btn">Entra</button>
           </div>
           <p id="pin-error" class="error"></p>
@@ -331,69 +694,79 @@
     </div>
 
     <!-- APP -->
-    <div id="app" class="card hidden">
+    <div id="app" class="hidden">
       <header>
         <h1>Spesa & Menu</h1>
-        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
-          <button id="export-btn" class="secondary" title="Esporta dati in JSON">Esporta</button>
-          <button id="import-btn" class="secondary" title="Importa dati da JSON">Importa</button>
-          <button id="lock-btn" class="secondary" title="Blocca con codice">Blocca</button>
+        <div class="header-chips">
+          <div class="pill-chip">
+            <span class="pill-dot"></span>
+            <span>Casa</span>
+          </div>
+          <button id="export-btn" class="icon-btn" title="Esporta dati (JSON)">⤓</button>
+          <button id="import-btn" class="icon-btn" title="Importa dati (JSON)">⤒</button>
+          <button id="lock-btn" class="icon-btn" title="Blocca con codice">🔒</button>
           <input type="file" id="import-file-input" accept="application/json" style="display:none;">
         </div>
       </header>
 
       <nav class="tabs">
-        <button type="button" class="tab-btn active" data-tab="shopping">Lista spesa</button>
-        <button type="button" class="tab-btn" data-tab="menu">Menu settimanale</button>
+        <button type="button" class="tab-btn active" data-tab="shopping">
+          <span class="icon">🛒</span>
+          <span>Spesa</span>
+        </button>
+        <button type="button" class="tab-btn" data-tab="menu">
+          <span class="icon">🍽️</span>
+          <span>Menu</span>
+        </button>
       </nav>
 
       <main>
         <!-- TAB SPESA -->
-        <section id="tab-shopping">
+        <section id="tab-shopping" class="card">
           <h2>Lista della spesa</h2>
-          <form id="shopping-form">
+          <form id="shopping-form" style="margin-top:0.4rem;">
             <div class="row">
               <div class="col">
                 <label for="item-name">Oggetto</label>
-                <input type="text" id="item-name" autocomplete="off" required>
+                <input type="text" id="item-name" autocomplete="off" required placeholder="es. Latte, pane...">
               </div>
               <div class="col">
-                <label for="item-qty">Quantità (opzionale)</label>
-                <input type="text" id="item-qty" autocomplete="off" placeholder="es. 1 kg, 3 pz...">
+                <label for="item-qty">Quantità</label>
+                <input type="text" id="item-qty" autocomplete="off" placeholder="es. 1 L, 3 pz...">
               </div>
             </div>
-            <div style="margin-top:0.6rem; display:flex; justify-content:flex-end;">
-              <button type="submit">Aggiungi alla lista</button>
+            <div style="margin-top:0.7rem; display:flex; justify-content:flex-end;">
+              <button type="submit" class="btn-primary">Aggiungi</button>
             </div>
           </form>
 
           <div class="shopping-actions">
-            <button type="button" id="clear-purchased-btn" class="secondary">Elimina comprati</button>
-            <button type="button" id="clear-all-btn" class="danger">Svuota lista</button>
+            <button type="button" id="clear-purchased-btn" class="btn-secondary">Elimina comprati</button>
+            <button type="button" id="clear-all-btn" class="btn-danger">Svuota lista</button>
           </div>
 
           <ul id="shopping-list"></ul>
           <p class="hint">
-            Gli ingredienti aggiunti automaticamente dal menu sono evidenziati in azzurro.
+            Gli ingredienti aggiunti automaticamente dal menu sono evidenziati e indicati come “dal menu”.
           </p>
         </section>
 
         <!-- TAB MENU -->
-        <section id="tab-menu" class="hidden">
+        <section id="tab-menu" class="card hidden">
           <h2>Menu settimanale</h2>
 
-          <div class="row">
+          <div class="row" style="margin-top:0.4rem;">
             <div class="col">
               <h3>Primi (max 14)</h3>
-              <form id="add-primo-form">
+              <form id="add-primo-form" style="margin-bottom:0.5rem;">
                 <label for="primo-name">Nome piatto</label>
-                <input type="text" id="primo-name" required>
+                <input type="text" id="primo-name" required placeholder="es. Pasta al pomodoro">
 
-                <label for="primo-ingredients">Ingredienti (uno per riga)</label>
-                <textarea id="primo-ingredients" placeholder="es. pasta, passata di pomodoro, olio..."></textarea>
+                <label for="primo-ingredients" style="margin-top:0.4rem;">Ingredienti (uno per riga)</label>
+                <textarea id="primo-ingredients" placeholder="pasta&#10;passata di pomodoro&#10;olio..."></textarea>
 
                 <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
-                  <button type="submit" class="secondary">Aggiungi primo</button>
+                  <button type="submit" class="btn-secondary">Aggiungi primo</button>
                 </div>
               </form>
 
@@ -402,15 +775,15 @@
 
             <div class="col">
               <h3>Secondi (max 14)</h3>
-              <form id="add-secondo-form">
+              <form id="add-secondo-form" style="margin-bottom:0.5rem;">
                 <label for="secondo-name">Nome piatto</label>
-                <input type="text" id="secondo-name" required>
+                <input type="text" id="secondo-name" required placeholder="es. Pollo e patate">
 
-                <label for="secondo-ingredients">Ingredienti (uno per riga)</label>
-                <textarea id="secondo-ingredients" placeholder="es. carne, patate, insalata..."></textarea>
+                <label for="secondo-ingredients" style="margin-top:0.4rem;">Ingredienti (uno per riga)</label>
+                <textarea id="secondo-ingredients" placeholder="pollo&#10;patate&#10;rosmarino..."></textarea>
 
                 <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
-                  <button type="submit" class="secondary">Aggiungi secondo</button>
+                  <button type="submit" class="btn-secondary">Aggiungi secondo</button>
                 </div>
               </form>
 
@@ -418,20 +791,20 @@
             </div>
           </div>
 
-          <div class="card" style="margin-top:1rem;">
+          <div style="margin-top:0.9rem;">
             <h3>Piano settimanale</h3>
             <table id="week-table"></table>
             <div style="margin-top:0.5rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
               <p class="hint" style="margin:0;">
                 Nei menu a tendina vedi “(scorsa settimana)” se il piatto è stato mangiato la settimana precedente.
               </p>
-              <button type="button" id="archive-week-btn" class="secondary">
+              <button type="button" id="archive-week-btn" class="btn-secondary">
                 Archivia settimana corrente
               </button>
             </div>
           </div>
 
-          <p class="hint">
+          <p class="hint" style="margin-top:0.6rem;">
             Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa.
             Togliendo il piatto, gli ingredienti collegati vengono rimossi se non servono ad altri piatti.
           </p>
@@ -503,7 +876,6 @@
         }
       }
 
-      // Download JSON helper
       function downloadJSON(data, filename) {
         const jsonString = JSON.stringify(data, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
@@ -517,7 +889,6 @@
         URL.revokeObjectURL(url);
       }
 
-      // PIN handling
       const lockScreen = document.getElementById('lock-screen');
       const pinSetup = document.getElementById('pin-setup');
       const pinLogin = document.getElementById('pin-login');
@@ -533,7 +904,7 @@
       const importFileInput = document.getElementById('import-file-input');
 
       function hashPin(pin) {
-        return btoa(pin); // semplice obfuscation, non crittografia forte
+        return btoa(pin);
       }
 
       function initPinScreen() {
@@ -590,7 +961,6 @@
         initPinScreen();
       });
 
-      // Export / Import
       exportBtn.addEventListener('click', function() {
         const payload = {
           state,
@@ -614,7 +984,6 @@
           try {
             const text = ev.target.result;
             const parsed = JSON.parse(text);
-
             const newState = parsed.state || parsed;
 
             if (!newState || typeof newState !== 'object') {
@@ -646,7 +1015,6 @@
         reader.readAsText(file, 'utf-8');
       });
 
-      // TABS
       const tabButtons = document.querySelectorAll('.tab-btn');
       const tabShopping = document.getElementById('tab-shopping');
       const tabMenu = document.getElementById('tab-menu');
@@ -661,7 +1029,6 @@
         });
       });
 
-      // Shopping list
       const shoppingForm = document.getElementById('shopping-form');
       const itemNameInput = document.getElementById('item-name');
       const itemQtyInput = document.getElementById('item-qty');
@@ -710,18 +1077,18 @@
         const item = state.shopping.find(it => it.id === id);
         if (!item) return;
 
-        if (e.target.matches('.purchase-checkbox')) {
-          item.purchased = e.target.checked;
+        if (e.target.matches('.purchase-checkbox') || e.target.closest('.check-circle')) {
+          item.purchased = !item.purchased;
           saveState();
           renderShopping();
-        } else if (e.target.matches('.delete-item-btn')) {
+        } else if (e.target.matches('.delete-item-btn') || e.target.closest('.delete-item-btn')) {
           if (item.fromMenu) {
             if (!confirm('Questo ingrediente è collegato al menu. Vuoi eliminarlo comunque?')) return;
           }
           state.shopping = state.shopping.filter(it => it.id !== id);
           saveState();
           renderShopping();
-        } else if (e.target.matches('.move-up-btn')) {
+        } else if (e.target.matches('.move-up-btn') || e.target.closest('.move-up-btn')) {
           const idx = state.shopping.indexOf(item);
           if (idx > 0) {
             const tmp = state.shopping[idx - 1];
@@ -730,7 +1097,7 @@
             saveState();
             renderShopping();
           }
-        } else if (e.target.matches('.move-down-btn')) {
+        } else if (e.target.matches('.move-down-btn') || e.target.closest('.move-down-btn')) {
           const idx = state.shopping.indexOf(item);
           if (idx < state.shopping.length - 1) {
             const tmp = state.shopping[idx + 1];
@@ -745,10 +1112,10 @@
       function renderShopping() {
         shoppingListEl.innerHTML = '';
         if (state.shopping.length === 0) {
-          const li = document.createElement('li');
-          li.className = 'hint';
-          li.textContent = 'La lista è vuota.';
-          shoppingListEl.appendChild(li);
+          const div = document.createElement('div');
+          div.className = 'empty-state';
+          div.textContent = 'La lista è vuota. Aggiungi qualcosa da comprare o genera gli ingredienti dal menu.';
+          shoppingListEl.appendChild(div);
           return;
         }
         state.shopping.forEach(item => {
@@ -757,48 +1124,65 @@
           li.dataset.id = item.id;
 
           const label = document.createElement('label');
-          const checkbox = document.createElement('input');
-          checkbox.type = 'checkbox';
-          checkbox.className = 'purchase-checkbox';
-          checkbox.checked = !!item.purchased;
 
-          const nameSpan = document.createElement('span');
+          const check = document.createElement('div');
+          check.className = 'check-circle' + (item.purchased ? ' done' : '');
+          check.innerHTML = item.purchased ? '✓' : '';
+          check.classList.add('purchase-checkbox');
+
+          const textWrap = document.createElement('div');
+          const nameSpan = document.createElement('div');
           nameSpan.className = 'shopping-item-name';
           nameSpan.textContent = item.name;
 
-          const qtySpan = document.createElement('span');
-          qtySpan.className = 'shopping-item-qty';
-          if (item.quantity) qtySpan.textContent = '· ' + item.quantity;
+          textWrap.appendChild(nameSpan);
 
-          label.appendChild(checkbox);
-          label.appendChild(nameSpan);
-          if (item.quantity) label.appendChild(qtySpan);
+          if (item.quantity) {
+            const qtySpan = document.createElement('div');
+            qtySpan.className = 'shopping-item-qty';
+            qtySpan.textContent = item.quantity;
+            textWrap.appendChild(qtySpan);
+          }
+
+          if (item.fromMenu) {
+            const srcSpan = document.createElement('div');
+            srcSpan.className = 'shopping-item-source';
+            srcSpan.textContent = 'dal menu';
+            textWrap.appendChild(srcSpan);
+          }
+
+          label.appendChild(check);
+          label.appendChild(textWrap);
+
+          const actions = document.createElement('div');
+          actions.className = 'item-actions';
 
           const upBtn = document.createElement('button');
           upBtn.type = 'button';
-          upBtn.className = 'small-btn move-up-btn';
-          upBtn.textContent = '↑';
+          upBtn.className = 'tiny-btn move-up-btn';
+          upBtn.innerHTML = '↑';
 
           const downBtn = document.createElement('button');
           downBtn.type = 'button';
-          downBtn.className = 'small-btn move-down-btn';
-          downBtn.textContent = '↓';
+          downBtn.className = 'tiny-btn move-down-btn';
+          downBtn.innerHTML = '↓';
 
           const delBtn = document.createElement('button');
           delBtn.type = 'button';
-          delBtn.className = 'small-btn delete-item-btn';
-          delBtn.textContent = '✕';
+          delBtn.className = 'tiny-btn del delete-item-btn';
+          delBtn.innerHTML = '✕';
+
+          actions.appendChild(upBtn);
+          actions.appendChild(downBtn);
+          actions.appendChild(delBtn);
 
           li.appendChild(label);
-          li.appendChild(upBtn);
-          li.appendChild(downBtn);
-          li.appendChild(delBtn);
+          li.appendChild(actions);
 
           shoppingListEl.appendChild(li);
         });
       }
 
-      // Dishes
       const primiListEl = document.getElementById('primi-list');
       const secondiListEl = document.getElementById('secondi-list');
       const addPrimoForm = document.getElementById('add-primo-form');
@@ -891,24 +1275,34 @@
           state.dishes.primi.forEach(dish => {
             const li = document.createElement('li');
             li.className = 'dish-item';
-            const left = document.createElement('div');
+
+            const dot = document.createElement('div');
+            dot.className = 'dish-type-dot primo';
+
+            const body = document.createElement('div');
+            body.className = 'dish-body';
+
             const nameSpan = document.createElement('div');
             nameSpan.className = 'dish-item-name';
             nameSpan.textContent = dish.name;
+
             const metaSpan = document.createElement('div');
             metaSpan.className = 'dish-item-meta';
             metaSpan.textContent = `${dish.ingredients.length} ingredienti`;
-            left.appendChild(nameSpan);
-            left.appendChild(metaSpan);
+
+            body.appendChild(nameSpan);
+            body.appendChild(metaSpan);
 
             const delBtn = document.createElement('button');
             delBtn.type = 'button';
-            delBtn.className = 'small-btn delete-dish-btn';
+            delBtn.className = 'tiny-btn delete-dish-btn';
             delBtn.dataset.id = dish.id;
             delBtn.textContent = 'Elimina';
 
-            li.appendChild(left);
+            li.appendChild(dot);
+            li.appendChild(body);
             li.appendChild(delBtn);
+
             primiListEl.appendChild(li);
           });
         }
@@ -923,24 +1317,34 @@
           state.dishes.secondi.forEach(dish => {
             const li = document.createElement('li');
             li.className = 'dish-item';
-            const left = document.createElement('div');
+
+            const dot = document.createElement('div');
+            dot.className = 'dish-type-dot secondo';
+
+            const body = document.createElement('div');
+            body.className = 'dish-body';
+
             const nameSpan = document.createElement('div');
             nameSpan.className = 'dish-item-name';
             nameSpan.textContent = dish.name;
+
             const metaSpan = document.createElement('div');
             metaSpan.className = 'dish-item-meta';
             metaSpan.textContent = `${dish.ingredients.length} ingredienti`;
-            left.appendChild(nameSpan);
-            left.appendChild(metaSpan);
+
+            body.appendChild(nameSpan);
+            body.appendChild(metaSpan);
 
             const delBtn = document.createElement('button');
             delBtn.type = 'button';
-            delBtn.className = 'small-btn delete-dish-btn';
+            delBtn.className = 'tiny-btn delete-dish-btn';
             delBtn.dataset.id = dish.id;
             delBtn.textContent = 'Elimina';
 
-            li.appendChild(left);
+            li.appendChild(dot);
+            li.appendChild(body);
             li.appendChild(delBtn);
+
             secondiListEl.appendChild(li);
           });
         }
@@ -956,7 +1360,6 @@
         });
       }
 
-      // Week table
       const weekTable = document.getElementById('week-table');
       const archiveWeekBtn = document.getElementById('archive-week-btn');
 
@@ -1121,7 +1524,6 @@
         renderShopping();
       }
 
-      // Init
       initPinScreen();
     })();
   </script>
