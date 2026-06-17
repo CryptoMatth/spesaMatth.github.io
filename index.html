@@ -1681,16 +1681,17 @@
           dishes.forEach(d => {
             const countWeek = getDishCurrentWeekCount(d.id);
             const maxWeek = d.maxPerWeek || 1;
-            const remaining = Math.max(0, maxWeek - countWeek);
             const overLimit = countWeek >= maxWeek;
             const wasPrev = prevSet.has(d.id);
 
             const tags = [];
-            tags.push('[' + remaining + ']'); // quantità rimanente
             if (countWeek > 0) tags.push('[SC]');
             if (wasPrev) tags.push('[SP]');
 
-            let label = tags.join(' ') + ' ' + d.name;
+            let label = d.name;
+            if (tags.length) {
+              label = tags.join(' ') + ' ' + d.name;
+            }
 
             const isMuted = overLimit || wasPrev;
             const optHtml = `<option value="${d.id}"${isMuted ? ' style="color:#A1A1AA;"' : ''}>${label}</option>`;
