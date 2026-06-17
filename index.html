@@ -793,13 +793,16 @@
               <div id="week-panel-current">
                 <h3>Settimana corrente</h3>
                 <table id="week-table-current"></table>
-
-                <div style="margin-top:0.5rem;">
-                  <p class="hint">
+              
+                <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center;">
+                  <p class="hint" style="flex:1; min-width:200px;">
                     Gli ingredienti per la spesa sono calcolati solo dalla settimana corrente.
                     I piatti già usati il massimo consentito o mangiati la settimana precedente
                     appaiono in fondo alla lista nel menu a tendina.
                   </p>
+                  <button type="button" id="clear-current-week-btn" class="btn-secondary">
+                    Svuota settimana corrente
+                  </button>
                 </div>
               </div>
 
@@ -809,9 +812,6 @@
                 <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
                   <button type="button" id="copy-current-to-prev-btn" class="btn-secondary">
                     Copia settimana corrente in settimana precedente
-                  </button>
-                  <button type="button" id="clear-prev-week-btn" class="btn-secondary">
-                    Svuota settimana precedente
                   </button>
                 </div>
                 <p class="hint">
@@ -1610,7 +1610,7 @@
       const weekTableCurrent = document.getElementById('week-table-current');
       const weekTablePrev = document.getElementById('week-table-prev');
       const copyCurrentToPrevBtn = document.getElementById('copy-current-to-prev-btn');
-      const clearPrevWeekBtn = document.getElementById('clear-prev-week-btn');
+      const clearCurrentWeekBtn = document.getElementById('clear-current-week-btn');
 
       function buildWeekTableSkeleton(table, selectClass) {
         let html = '<thead><tr><th>Giorno</th><th>Pranzo</th><th>Cena</th></tr></thead><tbody>';
@@ -1841,12 +1841,19 @@
         renderWeekSelectorsCurrent();
       });
 
-      clearPrevWeekBtn.addEventListener('click', function() {
-        if (!confirm('Svuotare completamente la settimana precedente?')) return;
-        state.weekPlanPrev = defaultWeekPlan();
+      clearCurrentWeekBtn.addEventListener('click', function() {
+        if (!confirm('Svuotare completamente la settimana corrente?')) return;
+      
+        // resetta la settimana corrente
+        state.weekPlanCurrent = defaultWeekPlan();
+      
+        // aggiorna ingredienti della spesa in base al nuovo piano (vuoto)
+        updateMenuIngredients();
         saveState();
-        renderWeekSelectorsPrev();
+      
+        // ridisegna i menu a tendina e la lista spesa
         renderWeekSelectorsCurrent();
+        renderShopping();
       });
 
       function updateMenuIngredients() {
