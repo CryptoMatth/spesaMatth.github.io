@@ -555,6 +555,10 @@
     }
     tr:last-child td { border-bottom: none; }
 
+    .slot {
+      margin-bottom: 4px;
+      position: relative;
+    }
     .slot-title {
       font-weight: 600;
       margin-bottom: 1px;
@@ -563,8 +567,27 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-    .slot { margin-bottom: 4px; }
-    .slot select { font-size: 12px; padding: 6px 7px; }
+
+    .slot select {
+      font-size: 12px;
+      padding: 6px 7px;
+      color: transparent;             /* nascondo testo reale */
+      text-shadow: 0 0 0 transparent; /* e relativo shadow */
+    }
+
+    .slot[data-display]::before {
+      content: attr(data-display);
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(1.2em + 4px); /* sotto il titolo */
+      padding: 6px 7px;
+      pointer-events: none;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     #edit-dish-modal {
       position: fixed;
@@ -793,7 +816,7 @@
                 </div>
                 <p class="hint">
                   Modifica qui la settimana precedente senza toccare la corrente.
-                  Le etichette “[SP]” (“settimana precedente”) nel menu a tendina si basano su questa tabella.
+                  Le etichette “[SP]” nel menu a tendina si basano su questa tabella.
                 </p>
               </div>
             </div>
@@ -920,7 +943,7 @@
       exportBtn.addEventListener('click', function() {
         const payload = {
           state,
-          version: 6,
+          version: 7,
           exportedAt: new Date().toISOString()
         };
         downloadJSON(payload, 'spesa-menu-backup.json');
@@ -1093,6 +1116,8 @@
         } else if (e.target.matches('.delete-item-btn') || e.target.closest('.delete-item-btn')) {
           if (item.fromMenu) {
             if (!confirm('Questo ingrediente proviene dal menu. Vuoi eliminarlo comunque?')) return;
+          } else {
+            if (!confirm('Vuoi eliminare questo elemento dalla lista?')) return;
           }
           state.shopping = state.shopping.filter(it => it.id !== id);
           saveState();
@@ -1323,6 +1348,9 @@
       primiListEl.addEventListener('click', function(e) {
         if (e.target.matches('.delete-dish-btn')) {
           const id = e.target.dataset.id;
+          const dish = state.dishes.primi.find(d => d.id === id);
+          if (!dish) return;
+          if (!confirm(`Vuoi davvero eliminare il piatto "${dish.name}"?`)) return;
           state.dishes.primi = state.dishes.primi.filter(d => d.id !== id);
           removeDishFromWeek(id);
           saveState();
@@ -1342,6 +1370,9 @@
       secondiListEl.addEventListener('click', function(e) {
         if (e.target.matches('.delete-dish-btn')) {
           const id = e.target.dataset.id;
+          const dish = state.dishes.secondi.find(d => d.id === id);
+          if (!dish) return;
+          if (!confirm(`Vuoi davvero eliminare il piatto "${dish.name}"?`)) return;
           state.dishes.secondi = state.dishes.secondi.filter(d => d.id !== id);
           removeDishFromWeek(id);
           saveState();
@@ -1644,6 +1675,23 @@
         return c;
       }
 
+      function setSelectDisplay(sel) {
+        const slot = sel.closest('.slot');
+        if (!slot) return;
+        const value = sel.value;
+        let label = '(nessuno)';
+
+        if (value === '__niente') label = 'Niente';
+        else if (value === '__fuori') label = 'Fuori';
+        else if (value) {
+          const dishes = sel.dataset.course === 'primo' ? state.dishes.primi : state.dishes.secondi;
+          const dish = dishes.find(d => d.id === value);
+          if (dish) label = dish.name;
+        }
+
+        slot.dataset.display = label;
+      }
+
       function renderWeekSelectorsCurrent() {
         const prevSet = getPrevWeekDishIdsSet();
         const selects = weekTableCurrent.querySelectorAll('.dish-select-current');
@@ -1662,41 +1710,48 @@
             ? state.dishes.primi
             : state.dishes.secondi;
 
-          const normalOptions = [];
-          const mutedOptions = [];
+          const groupAvailable = [];
+          const groupPrevWeek = [];
+          const groupZero = [];
 
           dishes.forEach(d => {
             const countWeek = getDishCurrentWeekCount(d.id);
-            const maxWeek = d.maxPerWeek || 1;
-            const overLimit = countWeek >= maxWeek;
+            const baseAllowed = d.maxPerWeek || 1;
+            const remaining = Math.max(0, baseAllowed - countWeek);
             const wasPrev = prevSet.has(d.id);
 
-            const tags = [];
-            if (countWeek > 0) tags.push('[SC]');
-            if (wasPrev) tags.push('[SP]');
-
-            let label = d.name;
-            if (tags.length) {
-              label = tags.join(' ') + ' ' + d.name;
+            if (remaining > 0 && !wasPrev) {
+              const prefix = `[${remaining}]`;
+              groupAvailable.push({ id: d.id, label: `${prefix} ${d.name}` });
+            } else if (wasPrev) {
+              groupPrevWeek.push({ id: d.id, label: `[SP] ${d.name}` });
+            } else {
+              groupZero.push({ id: d.id, label: `[0] ${d.name}` });
             }
-
-            const isMuted = overLimit || wasPrev;
-            const optHtml = `<option value="${d.id}"${isMuted ? ' style="color:#A1A1AA;"' : ''}>${label}</option>`;
-
-            if (isMuted) mutedOptions.push(optHtml);
-            else normalOptions.push(optHtml);
           });
 
           let optionsHtml = '<option value="">(nessuno)</option>';
+
+          groupAvailable.forEach(o => {
+            optionsHtml += `<option value="${o.id}">${o.label}</option>`;
+          });
+
+          groupPrevWeek.forEach(o => {
+            optionsHtml += `<option value="${o.id}">${o.label}</option>`;
+          });
+
           optionsHtml += '<option value="__niente">Niente</option>';
           optionsHtml += '<option value="__fuori">Fuori</option>';
-          optionsHtml += normalOptions.join('');
-          optionsHtml += mutedOptions.join('');
+
+          groupZero.forEach(o => {
+            optionsHtml += `<option value="${o.id}">${o.label}</option>`;
+          });
 
           sel.innerHTML = optionsHtml;
           if (currentId !== null && currentId !== undefined) {
             sel.value = currentId;
           }
+          setSelectDisplay(sel);
         });
       }
 
@@ -1728,6 +1783,7 @@
           if (currentId !== null && currentId !== undefined) {
             sel.value = currentId;
           }
+          setSelectDisplay(sel);
         });
       }
 
@@ -1751,6 +1807,7 @@
         updateMenuIngredients();
         saveState();
         renderShopping();
+        setSelectDisplay(sel);
         renderWeekSelectorsCurrent();
       });
 
@@ -1772,6 +1829,7 @@
           day[meal].secondoId = value;
         }
         saveState();
+        setSelectDisplay(sel);
         renderWeekSelectorsCurrent();
       });
 
