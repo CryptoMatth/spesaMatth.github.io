@@ -237,7 +237,7 @@
 
     h3 {
       font-size: 15px;
-      margin-top: 0;
+      margin-top: 0.5rem;
       margin-bottom: 0.5rem;
       font-weight: 700;
     }
@@ -779,18 +779,32 @@
             <div id="menu-piano" class="hidden">
               <h2>Piano settimanale</h2>
 
-              <h3>Settimana corrente</h3>
-              <table id="week-table-current"></table>
-
-              <div style="margin-top:0.5rem;">
-                <p class="hint">
-                  Gli ingredienti per la spesa sono calcolati solo dalla settimana corrente.
-                  I piatti già usati il massimo consentito o mangiati la settimana precedente
-                  appaiono in fondo alla lista e in grigio.
-                </p>
+              <!-- SOTTO-TAB PER LE SETTIMANE -->
+              <div class="menu-subtabs" style="margin-top:0.5rem;">
+                <button type="button" class="menu-subtab-btn active" data-weektab="current">
+                  Settimana corrente
+                </button>
+                <button type="button" class="menu-subtab-btn" data-weektab="prev">
+                  Settimana precedente
+                </button>
               </div>
 
-              <div style="margin-top:1rem;">
+              <!-- PANNELLO: SETTIMANA CORRENTE -->
+              <div id="week-panel-current">
+                <h3>Settimana corrente</h3>
+                <table id="week-table-current"></table>
+
+                <div style="margin-top:0.5rem;">
+                  <p class="hint">
+                    Gli ingredienti per la spesa sono calcolati solo dalla settimana corrente.
+                    I piatti già usati il massimo consentito o mangiati la settimana precedente
+                    appaiono in fondo alla lista e in grigio.
+                  </p>
+                </div>
+              </div>
+
+              <!-- PANNELLO: SETTIMANA PRECEDENTE -->
+              <div id="week-panel-prev" class="hidden" style="margin-top:0.75rem;">
                 <h3>Settimana precedente (solo riferimento)</h3>
                 <table id="week-table-prev"></table>
                 <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
@@ -1019,7 +1033,7 @@
         });
       });
 
-      const menuSubtabButtons = document.querySelectorAll('.menu-subtab-btn');
+      const menuSubtabButtons = document.querySelectorAll('.menu-subtab-btn[data-subtab]');
       const menuPiatti = document.getElementById('menu-piatti');
       const menuPiano = document.getElementById('menu-piano');
 
@@ -1030,6 +1044,21 @@
           const t = btn.dataset.subtab;
           menuPiatti.classList.toggle('hidden', t !== 'piatti');
           menuPiano.classList.toggle('hidden', t !== 'piano');
+        });
+      });
+
+      // week subtabs (current / prev)
+      const weekTabButtons = document.querySelectorAll('[data-weektab]');
+      const weekPanelCurrent = document.getElementById('week-panel-current');
+      const weekPanelPrev = document.getElementById('week-panel-prev');
+
+      weekTabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          weekTabButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const tab = btn.dataset.weektab;
+          weekPanelCurrent.classList.toggle('hidden', tab !== 'current');
+          weekPanelPrev.classList.toggle('hidden', tab !== 'prev');
         });
       });
 
