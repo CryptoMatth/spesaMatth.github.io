@@ -798,7 +798,7 @@
                   <p class="hint">
                     Gli ingredienti per la spesa sono calcolati solo dalla settimana corrente.
                     I piatti già usati il massimo consentito o mangiati la settimana precedente
-                    appaiono in fondo alla lista e in grigio.
+                    appaiono in fondo alla lista nel menu a tendina.
                   </p>
                 </div>
               </div>
@@ -817,7 +817,7 @@
                 </div>
                 <p class="hint">
                   Modifica qui la settimana precedente senza toccare la corrente.
-                  Le etichette “(settimana scorsa)” si basano su questa tabella.
+                  Le etichette “[SP]” (“settimana precedente”) nel menu a tendina si basano su questa tabella.
                 </p>
               </div>
             </div>
@@ -1681,15 +1681,16 @@
           dishes.forEach(d => {
             const countWeek = getDishCurrentWeekCount(d.id);
             const maxWeek = d.maxPerWeek || 1;
+            const remaining = Math.max(0, maxWeek - countWeek);
             const overLimit = countWeek >= maxWeek;
             const wasPrev = prevSet.has(d.id);
 
             const tags = [];
-            if (countWeek > 0) tags.push('questa settimana');
-            if (wasPrev) tags.push('settimana scorsa');
+            tags.push('[' + remaining + ']'); // quantità rimanente
+            if (countWeek > 0) tags.push('[SC]');
+            if (wasPrev) tags.push('[SP]');
 
-            let label = d.name;
-            if (tags.length) label += ' (' + tags.join(', ') + ')';
+            let label = tags.join(' ') + ' ' + d.name;
 
             const isMuted = overLimit || wasPrev;
             const optHtml = `<option value="${d.id}"${isMuted ? ' style="color:#A1A1AA;"' : ''}>${label}</option>`;
