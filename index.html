@@ -39,17 +39,21 @@
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg:       #111110;
-        --surface:  #1C1C1A;
-        --surface2: #242422;
-        --border:   #3A3A37;
-        --border2:  #4A4A46;
+        --bg:       #141418;
+        --surface:  #1E2024;
+        --surface2: #26282E;
+        --border:   #343741;
+        --border2:  #464955;
 
-        --text:  #F5F5F3;
-        --text2: #8E8E8B;
-        --text3: #5A5A57;
+        --text:  #F4F4F5;
+        --text2: #A1A1AA;
+        --text3: #71717A;
 
-        --accent-bg: #2E1A0F;
+        --accent-bg: #3A2419;
+      }
+
+      body {
+        background: radial-gradient(circle at top, #1F2933 0, #020617 55%);
       }
     }
 
@@ -188,6 +192,38 @@
     .tabs button span.icon {
       font-size: 17px;
       line-height: 1;
+    }
+
+    .menu-subtabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 0.5rem;
+    }
+
+    .menu-subtab-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--text3);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 6px 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all var(--trans);
+    }
+
+    .menu-subtab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: var(--shadow-chip);
     }
 
     .hidden { display: none !important; }
@@ -579,7 +615,7 @@
       inset: 0;
       max-width: 520px;
       margin: 0 auto;
-      background: radial-gradient(circle at top, #355c47 0, #172b22 55%);
+      background: radial-gradient(circle at top, #1F2933 0, #020617 55%);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -816,71 +852,92 @@
 
         <!-- TAB MENU -->
         <section id="tab-menu" class="hidden">
-          <!-- Card 1: gestione piatti -->
           <div class="card">
-            <h2>Gestione piatti</h2>
-            <p class="hint">
-              Formato ingredienti: uno per riga, opzionale quantità dopo <code>;</code> (es. <code>pasta; 200 g</code>).
-            </p>
-
-            <div class="row" style="margin-top:0.6rem;">
-              <div class="col">
-                <h3>Primi (max 14)</h3>
-                <form id="add-primo-form" style="margin-bottom:0.5rem;">
-                  <label for="primo-name">Nome piatto</label>
-                  <input type="text" id="primo-name" required placeholder="es. Pasta al pomodoro">
-
-                  <label for="primo-ingredients" style="margin-top:0.4rem;">
-                    Ingredienti (uno per riga, opzionale quantità con “;”)
-                  </label>
-                  <textarea id="primo-ingredients" placeholder="pasta; 200 g&#10;passata; 1 barattolo..."></textarea>
-
-                  <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
-                    <button type="submit" class="btn-secondary">Aggiungi primo</button>
-                  </div>
-                </form>
-
-                <ul id="primi-list" class="dish-list"></ul>
-              </div>
-
-              <div class="col">
-                <h3>Secondi (max 14)</h3>
-                <form id="add-secondo-form" style="margin-bottom:0.5rem;">
-                  <label for="secondo-name">Nome piatto</label>
-                  <input type="text" id="secondo-name" required placeholder="es. Pollo e patate">
-
-                  <label for="secondo-ingredients" style="margin-top:0.4rem;">
-                    Ingredienti (uno per riga, opzionale quantità con “;”)
-                  </label>
-                  <textarea id="secondo-ingredients" placeholder="pollo; 300 g&#10;patate; 500 g..."></textarea>
-
-                  <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
-                    <button type="submit" class="btn-secondary">Aggiungi secondo</button>
-                  </div>
-                </form>
-
-                <ul id="secondi-list" class="dish-list"></ul>
-              </div>
+            <div class="menu-subtabs">
+              <button type="button" class="menu-subtab-btn active" data-subtab="piatti">Piatti</button>
+              <button type="button" class="menu-subtab-btn" data-subtab="piano">Piano</button>
             </div>
-          </div>
 
-          <!-- Card 2: piano settimanale -->
-          <div class="card">
-            <h2>Piano settimanale</h2>
-            <table id="week-table"></table>
-            <div style="margin-top:0.5rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-              <p class="hint" style="margin:0;">
-                Nei menu a tendina vedi “(scorsa settimana)” se il piatto è stato mangiato la settimana precedente.
+            <div id="menu-piatti">
+              <h2>Gestione piatti</h2>
+              <p class="hint">
+                Formato ingredienti: uno per riga, opzionale quantità dopo <code>;</code> (es. <code>pasta; 200 g</code>).
               </p>
-              <button type="button" id="archive-week-btn" class="btn-secondary">
-                Archivia settimana corrente
-              </button>
+
+              <div class="row" style="margin-top:0.6rem;">
+                <div class="col">
+                  <h3>Primi (max 14)</h3>
+                  <form id="add-primo-form" style="margin-bottom:0.5rem;">
+                    <label for="primo-name">Nome piatto</label>
+                    <input type="text" id="primo-name" required placeholder="es. Pasta al pomodoro">
+
+                    <label for="primo-ingredients" style="margin-top:0.4rem;">
+                      Ingredienti (uno per riga, opzionale quantità con “;”)
+                    </label>
+                    <textarea id="primo-ingredients" placeholder="pasta; 200 g&#10;passata; 1 barattolo..."></textarea>
+
+                    <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
+                      <button type="submit" class="btn-secondary">Aggiungi primo</button>
+                    </div>
+                  </form>
+
+                  <ul id="primi-list" class="dish-list"></ul>
+                </div>
+
+                <div class="col">
+                  <h3>Secondi (max 14)</h3>
+                  <form id="add-secondo-form" style="margin-bottom:0.5rem;">
+                    <label for="secondo-name">Nome piatto</label>
+                    <input type="text" id="secondo-name" required placeholder="es. Pollo e patate">
+
+                    <label for="secondo-ingredients" style="margin-top:0.4rem;">
+                      Ingredienti (uno per riga, opzionale quantità con “;”)
+                    </label>
+                    <textarea id="secondo-ingredients" placeholder="pollo; 300 g&#10;patate; 500 g..."></textarea>
+
+                    <div style="margin-top:0.5rem; display:flex; justify-content:flex-end;">
+                      <button type="submit" class="btn-secondary">Aggiungi secondo</button>
+                    </div>
+                  </form>
+
+                  <ul id="secondi-list" class="dish-list"></ul>
+                </div>
+              </div>
             </div>
 
-            <p class="hint" style="margin-top:0.6rem;">
-              Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa
-              con nome e quantità indicata. Se lo stesso ingrediente appare più volte nella settimana, vedrai il moltiplicatore (×2, ×3, ...).
-            </p>
+            <div id="menu-piano" class="hidden">
+              <h2>Piano settimanale</h2>
+              <table id="week-table"></table>
+
+              <div style="margin-top:0.5rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <p class="hint" style="margin:0;">
+                  L'ultima settimana archiviata viene usata per mostrare “(scorsa settimana)” nei menu a tendina.
+                </p>
+                <button type="button" id="archive-week-btn" class="btn-secondary">
+                  Archivia settimana corrente
+                </button>
+              </div>
+
+              <div style="margin-top:0.75rem;">
+                <label for="history-select">Storico settimane</label>
+                <div class="row" style="margin-top:0.25rem; align-items:flex-end;">
+                  <div class="col">
+                    <select id="history-select"></select>
+                  </div>
+                  <div class="col" style="flex:0 0 auto; display:flex; gap:0.4rem;">
+                    <button type="button" id="load-history-btn" class="btn-secondary">Carica in piano</button>
+                  </div>
+                </div>
+                <p class="hint">
+                  Usa lo storico per rivedere o ripristinare un piano precedente. L'ultima settimana archiviata rimane la “scorsa settimana” usata per evitare di ripetere troppi piatti.
+                </p>
+              </div>
+
+              <p class="hint" style="margin-top:0.6rem;">
+                Quando aggiungi un piatto al piano, i suoi ingredienti vengono inseriti automaticamente nella lista della spesa
+                con nome e quantità indicata. Se lo stesso ingrediente appare più volte nella settimana, vedrai il moltiplicatore (×2, ×3, ...).
+              </p>
+            </div>
           </div>
         </section>
       </main>
@@ -917,7 +974,7 @@
         shopping: [],
         dishes: { primi: [], secondi: [] },
         weekPlan: defaultWeekPlan(),
-        prevWeekPlan: {}
+        historyWeeks: []
       };
 
       function uid() {
@@ -932,11 +989,22 @@
           state = Object.assign({}, state, parsed);
 
           if (!state.weekPlan) state.weekPlan = defaultWeekPlan();
-          if (!state.prevWeekPlan) state.prevWeekPlan = {};
           if (!state.dishes) state.dishes = { primi: [], secondi: [] };
           if (!state.dishes.primi) state.dishes.primi = [];
           if (!state.dishes.secondi) state.dishes.secondi = [];
           if (!Array.isArray(state.shopping)) state.shopping = [];
+
+          if (!Array.isArray(state.historyWeeks)) state.historyWeeks = [];
+
+          // migrazione da vecchio prevWeekPlan, se esiste
+          if (state.prevWeekPlan && Object.keys(state.prevWeekPlan).length && state.historyWeeks.length === 0) {
+            state.historyWeeks.push({
+              id: uid(),
+              label: 'Settimana precedente (importata)',
+              createdAt: new Date().toISOString(),
+              weekPlan: state.prevWeekPlan
+            });
+          }
         } catch (e) {
           console.error('Errore nel loadState', e);
         }
@@ -1047,7 +1115,7 @@
       exportBtn.addEventListener('click', function() {
         const payload = {
           state,
-          version: 1,
+          version: 2,
           exportedAt: new Date().toISOString()
         };
         downloadJSON(payload, 'spesa-menu-backup.json');
@@ -1081,11 +1149,11 @@
             state = Object.assign({}, state, newState);
 
             if (!state.weekPlan) state.weekPlan = defaultWeekPlan();
-            if (!state.prevWeekPlan) state.prevWeekPlan = {};
             if (!state.dishes) state.dishes = { primi: [], secondi: [] };
             if (!state.dishes.primi) state.dishes.primi = [];
             if (!state.dishes.secondi) state.dishes.secondi = [];
             if (!Array.isArray(state.shopping)) state.shopping = [];
+            if (!Array.isArray(state.historyWeeks)) state.historyWeeks = [];
 
             saveState();
             renderAll();
@@ -1109,6 +1177,21 @@
           const tab = btn.dataset.tab;
           tabShopping.classList.toggle('hidden', tab !== 'shopping');
           tabMenu.classList.toggle('hidden', tab !== 'menu');
+        });
+      });
+
+      // Sub-tab menu (Piatti / Piano)
+      const menuSubtabButtons = document.querySelectorAll('.menu-subtab-btn');
+      const menuPiatti = document.getElementById('menu-piatti');
+      const menuPiano = document.getElementById('menu-piano');
+
+      menuSubtabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          menuSubtabButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const t = btn.dataset.subtab;
+          menuPiatti.classList.toggle('hidden', t !== 'piatti');
+          menuPiano.classList.toggle('hidden', t !== 'piano');
         });
       });
 
@@ -1155,7 +1238,6 @@
         renderShopping();
       });
 
-      // CLICK (check/delete)
       shoppingListEl.addEventListener('click', function(e) {
         const li = e.target.closest('.shopping-item');
         if (!li) return;
@@ -1615,6 +1697,8 @@
 
       const weekTable = document.getElementById('week-table');
       const archiveWeekBtn = document.getElementById('archive-week-btn');
+      const historySelect = document.getElementById('history-select');
+      const loadHistoryBtn = document.getElementById('load-history-btn');
 
       function buildWeekTableSkeleton() {
         let html = '<thead><tr><th>Giorno</th><th>Pranzo</th><th>Cena</th></tr></thead><tbody>';
@@ -1651,7 +1735,10 @@
 
       function getPrevWeekDishIdsSet() {
         const set = new Set();
-        const prev = state.prevWeekPlan || {};
+        const history = state.historyWeeks || [];
+        if (history.length === 0) return set;
+        const last = history[history.length - 1];
+        const prev = last.weekPlan || {};
         Object.keys(prev).forEach(dayKey => {
           const day = prev[dayKey];
           if (!day) return;
@@ -1715,12 +1802,49 @@
       });
 
       archiveWeekBtn.addEventListener('click', function() {
-        if (!confirm('Archiviare la settimana corrente come "settimana precedente" e azzerare il piano?')) return;
-        state.prevWeekPlan = JSON.parse(JSON.stringify(state.weekPlan));
+        if (!confirm('Archiviare la settimana corrente come nuova voce nello storico e azzerare il piano?')) return;
+        const now = new Date();
+        const label = `Settimana del ${now.toLocaleDateString('it-IT')}`;
+        if (!Array.isArray(state.historyWeeks)) state.historyWeeks = [];
+        state.historyWeeks.push({
+          id: uid(),
+          label,
+          createdAt: now.toISOString(),
+          weekPlan: JSON.parse(JSON.stringify(state.weekPlan))
+        });
         state.weekPlan = defaultWeekPlan();
         updateMenuIngredients();
         saveState();
         renderWeekSelectors();
+        renderHistorySelect();
+      });
+
+      function renderHistorySelect() {
+        const weeks = state.historyWeeks || [];
+        if (!weeks.length) {
+          historySelect.innerHTML = '<option value="">Nessuna settimana archiviata</option>';
+          return;
+        }
+        let options = '<option value="">Seleziona una settimana...</option>';
+        weeks.slice().reverse().forEach(w => {
+          const label = w.label || (w.createdAt ? new Date(w.createdAt).toLocaleDateString('it-IT') : 'Settimana');
+          options += `<option value="${w.id}">${label}</option>`;
+        });
+        historySelect.innerHTML = options;
+      }
+
+      loadHistoryBtn.addEventListener('click', function() {
+        const id = historySelect.value;
+        if (!id) return;
+        const weeks = state.historyWeeks || [];
+        const week = weeks.find(w => w.id === id);
+        if (!week) return;
+        if (!confirm('Sostituire il piano settimanale corrente con quello archiviato selezionato?')) return;
+        state.weekPlan = JSON.parse(JSON.stringify(week.weekPlan || defaultWeekPlan()));
+        updateMenuIngredients();
+        saveState();
+        renderWeekSelectors();
+        renderShopping();
       });
 
       function updateMenuIngredients() {
@@ -1788,6 +1912,7 @@
         buildWeekTableSkeleton();
         renderDishes();
         renderWeekSelectors();
+        renderHistorySelect();
         updateMenuIngredients();
         saveState();
         renderShopping();
