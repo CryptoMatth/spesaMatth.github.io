@@ -1202,9 +1202,18 @@
           textWrap.appendChild(nameSpan);
 
           if (item.quantity) {
-            const qtySpan = document.createElement('div');
+            const qtySpan = document.createElement('span');
             qtySpan.className = 'shopping-item-qty';
             qtySpan.textContent = item.quantity;
+          
+            // se proviene dal menu e ha moltiplicatore > 1, aggiungi "×N" sulla stessa riga
+            if (item.fromMenu && item.menuUsageCount && item.menuUsageCount > 1) {
+              const multSpan = document.createElement('span');
+              multSpan.className = 'shopping-item-qty';
+              multSpan.textContent = ' ×' + item.menuUsageCount;
+              qtySpan.appendChild(multSpan);
+            }
+          
             textWrap.appendChild(qtySpan);
           }
 
