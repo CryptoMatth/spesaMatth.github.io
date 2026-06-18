@@ -436,12 +436,14 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .shopping-item-qty {
       display: inline-block;
       font-size: 12px;
       color: var(--text2);
       margin-top: 1px;
     }
+
     .shopping-item-source {
       font-size: 11px;
       color: var(--accent);
@@ -572,8 +574,8 @@
     .slot select {
       font-size: 12px;
       padding: 6px 7px;
-      color: transparent;             /* nascondo testo reale */
-      text-shadow: 0 0 0 transparent; /* e relativo shadow */
+      color: transparent;
+      text-shadow: 0 0 0 transparent;
     }
 
     .slot[data-display]::before {
@@ -581,7 +583,7 @@
       position: absolute;
       left: 0;
       right: 0;
-      top: calc(1.2em + 4px); /* sotto il titolo */
+      top: calc(1.2em + 4px);
       padding: 6px 7px;
       pointer-events: none;
       color: var(--text);
@@ -794,7 +796,7 @@
               <div id="week-panel-current">
                 <h3>Settimana corrente</h3>
                 <table id="week-table-current"></table>
-              
+
                 <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center;">
                   <p class="hint" style="flex:1; min-width:200px;">
                     Gli ingredienti per la spesa sono calcolati solo dalla settimana corrente.
@@ -1202,29 +1204,22 @@
 
           textWrap.appendChild(nameSpan);
 
-          if (item.quantity) {
+          const hasQtyOrMult = item.quantity || (item.fromMenu && item.menuUsageCount && item.menuUsageCount > 1);
+          if (hasQtyOrMult) {
             const qtySpan = document.createElement('span');
             qtySpan.className = 'shopping-item-qty';
-            qtySpan.textContent = item.quantity;
-          
-            // se proviene dal menu e ha moltiplicatore > 1, aggiungi "×N" sulla stessa riga
+            let qtyText = item.quantity ? item.quantity : '';
             if (item.fromMenu && item.menuUsageCount && item.menuUsageCount > 1) {
-              const multSpan = document.createElement('span');
-              multSpan.className = 'shopping-item-qty';
-              multSpan.textContent = ' ×' + item.menuUsageCount;
-              qtySpan.appendChild(multSpan);
+              qtyText += (qtyText ? ' ×' : '×') + item.menuUsageCount;
             }
-          
+            qtySpan.textContent = qtyText;
             textWrap.appendChild(qtySpan);
           }
 
           if (item.fromMenu) {
             const srcSpan = document.createElement('div');
             srcSpan.className = 'shopping-item-source';
-            let labelText = item.menuDishName || 'dal menu';
-            if (item.menuUsageCount && item.menuUsageCount > 1) {
-              labelText += ' ×' + item.menuUsageCount;
-            }
+            const labelText = item.menuDishName || 'dal menu';
             srcSpan.textContent = labelText;
             textWrap.appendChild(srcSpan);
           }
@@ -1853,15 +1848,9 @@
 
       clearCurrentWeekBtn.addEventListener('click', function() {
         if (!confirm('Svuotare completamente la settimana corrente?')) return;
-      
-        // resetta la settimana corrente
         state.weekPlanCurrent = defaultWeekPlan();
-      
-        // aggiorna ingredienti della spesa in base al nuovo piano (vuoto)
         updateMenuIngredients();
         saveState();
-      
-        // ridisegna i menu a tendina e la lista spesa
         renderWeekSelectorsCurrent();
         renderShopping();
       });
